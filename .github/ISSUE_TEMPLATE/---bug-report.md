@@ -9,7 +9,7 @@ assignees: ''
 
 **Before you submit this: WE ONLY ACCEPT BUG REPORTS AND FEATURE REQUESTS**
 
-For more information see [our contribution guidelines](https://github.com/dry-rb/dry-cli/blob/master/CONTRIBUTING.md)
+For more information see `CONTRIBUTING.md`.
 
 **Describe the bug**
 
