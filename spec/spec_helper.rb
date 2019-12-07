@@ -11,17 +11,11 @@ FileUtils.mkdir_p(RELATIVE_TMP)
 
 TMP = SPEC_ROOT.join("..", RELATIVE_TMP).realpath
 
-if RUBY_ENGINE == "ruby" && ENV["COVERAGE"] == "true"
-  require "yaml"
-  rubies = YAML.safe_load(File.read(SPEC_ROOT.join("../.travis.yml")))["rvm"]
-  latest_mri = rubies.select { |v| v =~ /\A\d+\.\d+.\d+\z/ }.max
+if ENV["COVERAGE"] == "true"
+  require "simplecov"
 
-  if RUBY_VERSION >= latest_mri
-    require "simplecov"
-
-    SimpleCov.start do
-      add_filter "/spec/"
-    end
+  SimpleCov.start do
+    add_filter "/spec/"
   end
 end
 
