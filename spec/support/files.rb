@@ -28,7 +28,7 @@ module RSpec
       end
 
       def random_string(length: 16)
-        SecureRandom.alphanumeric(length)
+        SecureRandom.hex(length)
       end
     end
   end
