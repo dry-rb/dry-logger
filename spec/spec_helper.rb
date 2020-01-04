@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'support/coverage'
+
 require "pathname"
 require "fileutils"
 require "securerandom"
@@ -10,14 +12,6 @@ RELATIVE_TMP = File.join(".", "tmp")
 FileUtils.mkdir_p(RELATIVE_TMP)
 
 TMP = SPEC_ROOT.join("..", RELATIVE_TMP).realpath
-
-if ENV["COVERAGE"] == "true"
-  require "simplecov"
-
-  SimpleCov.start do
-    add_filter "/spec/"
-  end
-end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
