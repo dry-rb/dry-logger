@@ -2,9 +2,6 @@
 
 source "https://rubygems.org"
 
-gemspec
+eval_gemfile 'Gemfile.devtools'
 
-group :test do
-  gem 'simplecov', require: false, platform: :mri
-end
-  
+gemspec
