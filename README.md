@@ -1,33 +1,29 @@
-# Dry::Logger
+[gem]: https://rubygems.org/gems/dry-logger
+[actions]: https://github.com/dry-rb/dry-logger/actions
+[codacy]: https://www.codacy.com/gh/dry-rb/dry-logger
+[chat]: https://dry-rb.zulipchat.com
+[inchpages]: http://inch-ci.org/github/dry-rb/dry-logger
 
-Standalone logger library.
+# dry-logger [![Join the chat at https://dry-rb.zulipchat.com](https://img.shields.io/badge/dry--rb-join%20chat-%23346b7a.svg)][chat]
 
-## Installation
+[![Gem Version](https://badge.fury.io/rb/dry-logger.svg)][gem]
+[![CI Status](https://github.com/dry-rb/dry-logger/workflows/ci/badge.svg)][actions]
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/22edf59617be4aef97cfbe4e1c99f1ce)][codacy]
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/22edf59617be4aef97cfbe4e1c99f1ce)][codacy]
+[![Inline docs](http://inch-ci.org/github/dry-rb/dry-logger.svg?branch=master)][inchpages]
 
-Add this line to your application's Gemfile:
+## Links
 
-```ruby
-gem 'dry-logger'
-```
+* [User documentation](http://dry-rb.org/gems/dry-logger)
+* [API documentation](http://rubydoc.info/gems/dry-logger)
 
-And then execute:
+## Supported Ruby versions
 
-    $ bundle
+This library officially supports the following Ruby versions:
 
-Or install it yourself as:
+* MRI >= `2.4`
+* jruby >= `9.2`
 
-    $ gem install dry-logger
+## License
 
-## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/dry-rb/dry-logger.
+See `LICENSE` file.
