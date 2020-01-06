@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "pathname"
-require "securerandom"
+require 'pathname'
+require 'securerandom'
 
 module RSpec
   module Support

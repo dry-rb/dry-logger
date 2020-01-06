@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "pathname"
-require "stringio"
+require 'pathname'
+require 'stringio'
 
 module RSpec
   module Support
@@ -16,13 +16,13 @@ module RSpec
           stream.rewind
           stream.read
         when ::IO
-          raise "boom"
+          raise 'boom'
         end
       end
 
       def io_stream(destination)
-        fd = ::IO.sysopen(destination, "w")
-        ::IO.new(fd, "w")
+        fd = ::IO.sysopen(destination, 'w')
+        ::IO.new(fd, 'w')
       end
     end
   end
