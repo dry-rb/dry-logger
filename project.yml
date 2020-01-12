@@ -1,2 +1,10 @@
 name: dry-logger
 codacy_id: 5aae4837b97044cfa4537f083ad584e9
+gemspec:
+  authors: ["Luca Guidi"]
+  email: ["me@lucaguidi.com"]
+  summary: "Logging for Ruby"
+  development_dependencies:
+    - bundler
+    - rake
+    - rspec
