@@ -14,7 +14,7 @@ module Dry
 
       DEFAULT = INFO
 
-      # @since 0.8.0
+      # @since 0.1.0
       # @api private
       LEVELS = ::Hash[
         'debug' => DEBUG,

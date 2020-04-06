@@ -7,13 +7,16 @@ module Dry
   class Logger < ::Logger
     require 'dry/logger/version'
     require 'dry/logger/level'
+    require 'dry/logger/formatter'
 
-    def initialize(stream: $stdout, level: INFO)
+    def initialize(stream: $stdout, level: INFO, formatter: nil, filters: [])
       _safe_create_stream_directory(stream)
       super(stream)
 
       @stream = stream
       @level = Level[level]
+
+      self.formatter = Formatter.fabricate(formatter, filters)
       freeze
     end
 
