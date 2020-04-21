@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Dry::Logger do
+  before do
+    allow(Time).to receive(:now).and_return(Time.parse("2017-01-15 16:00:23 +0100"))
+  end
+
   describe '#initialize' do
     it "returns a frozen instance of #{described_class}" do
       expect(subject).to be_kind_of(described_class)
@@ -147,6 +151,130 @@ RSpec.describe Dry::Logger do
           expect(subject.level).to eq(Dry::Logger::ERROR)
         end
       end
+    end
+  end
+
+  describe 'with nil formatter' do
+    subject { described_class.new(formatter: nil) }
+
+    it 'falls back to Formatter' do
+      output = with_captured_stdout do
+        subject.info('foo')
+      end
+
+      expect(output).to eq "foo\n"
+    end
+  end
+
+  describe 'with JSON formatter' do
+    it 'when passed as a symbol, it has JSON format for string messages' do
+      output = with_captured_stdout do
+        described_class.new(formatter: :json).info('foo')
+      end
+
+      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
+    end
+
+    it 'has JSON format for string messages' do
+      output = with_captured_stdout do
+        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info('foo')
+      end
+
+      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
+    end
+
+    it 'has JSON format for error messages' do
+      output = with_captured_stdout do
+        described_class.new(formatter: Dry::Logger::JSONFormatter.new).error(Exception.new('foo'))
+      end
+
+      expect(output).to eq %({"severity":"ERROR","time":"2017-01-15T15:00:23Z","message":"foo","backtrace":[],"error":"Exception"}\n)
+    end
+
+    it 'has JSON format for hash messages' do
+      output = with_captured_stdout do
+        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(foo: :bar)
+      end
+
+      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","foo":"bar"}\n)
+    end
+
+    it 'has JSON format for not string messages' do
+      output = with_captured_stdout do
+        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(['foo'])
+      end
+
+      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":["foo"]}\n)
+    end
+  end
+
+  describe 'with application formatter' do
+    subject { described_class.new(formatter: :application) }
+
+    it 'when passed as a symbol, it has key=value format for string messages' do
+      output = with_captured_stdout do
+        subject.info('foo')
+      end
+
+      expect(output).to eq "[INFO] [2017-01-15 16:00:23 +0100] foo\n"
+    end
+
+    it 'has key=value format for hash messages' do
+      output = with_captured_stdout do
+        subject.info(foo: "bar")
+      end
+
+      expect(output).to eq %([INFO] [2017-01-15 16:00:23 +0100] foo="bar"\n)
+    end
+
+    it 'has key=value format for error messages' do
+      exc = nil
+      output = with_captured_stdout do
+        begin
+          raise StandardError.new('foo')
+        rescue => exception
+          exc = exception
+        end
+        subject.error(exc)
+      end
+
+      expectation = "[ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo\n"
+      backtrace = exc.backtrace.map { |line| "from #{line}\n" }.join
+
+      expect(output).to eq (expectation + backtrace)
+    end
+  end
+
+  describe 'with filters' do
+    let(:filters) { %w[password password_confirmation credit_card user.login] }
+
+    let(:params) do
+      Hash[
+        params: Hash[
+          'password' => 'password',
+          'password_confirmation' => 'password',
+          'credit_card' => Hash[
+            'number' => '4545 4545 4545 4545',
+            'name' => 'John Citizen'
+          ],
+          'user' => Hash[
+            'login' => 'John',
+            'name'  => 'John'
+          ]
+        ]
+      ]
+    end
+
+    subject { described_class.new(formatter: :application, filters: filters) }
+
+    it 'filters values for keys in the filters array' do
+      expected = %s({"password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]", "credit_card"=>{"number"=>"[FILTERED]", "name"=>"[FILTERED]"}, "user"=>{"login"=>"[FILTERED]", "name"=>"John"}})
+
+      output = with_captured_stdout do
+        subject.info(params)
+      end
+
+      expect(output).to eq("[INFO] [2017-01-15 16:00:23 +0100] #{expected}\n")
     end
   end
 
