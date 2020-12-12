@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'logger'
-require 'pathname'
+require "logger"
+require "pathname"
 
 module Dry
   class Logger < ::Logger
-    require 'dry/logger/version'
-    require 'dry/logger/level'
-    require 'dry/logger/formatter'
+    require "dry/logger/version"
+    require "dry/logger/level"
+    require "dry/logger/formatter"
 
     def initialize(stream: $stdout, level: INFO, formatter: nil, filters: [])
       _safe_create_stream_directory(stream)
