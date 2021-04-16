@@ -8,8 +8,9 @@ RSpec.describe Dry::Logger do
   end
 
   describe ".new" do
+    let(:subject) { described_class.new }
+
     it "returns a frozen instance of a stream logger" do
-      subject = described_class.new
       expect(subject).to be_kind_of(Dry::Logger::Backends::Stream)
       expect(subject).to be_frozen
     end
@@ -184,7 +185,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info("foo")
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info("foo")
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
@@ -192,7 +193,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for error messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).error(Exception.new("foo"))
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
       end
 
       expect(output).to eq %({"severity":"ERROR","time":"2017-01-15T15:00:23Z","message":"foo","backtrace":[],"error":"Exception"}\n)
@@ -200,7 +201,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for hash messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(foo: :bar)
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","foo":"bar"}\n)
@@ -208,7 +209,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for not string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(["foo"])
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":["foo"]}\n)

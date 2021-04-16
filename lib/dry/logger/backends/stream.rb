@@ -4,7 +4,6 @@ require "logger"
 require "pathname"
 
 require "dry/logger/level"
-require "dry/logger/formatter"
 
 module Dry
   module Logger
@@ -14,13 +13,13 @@ module Dry
 
         attr_reader :level
 
-        def initialize(stream:, level: INFO, formatter: nil, filters: [])
+        def initialize(stream:, level: INFO, formatter: nil, **)
           super(stream)
 
           @stream = stream
           @level = Level[level]
 
-          self.formatter = Formatter.fabricate(formatter, filters)
+          self.formatter = formatter
 
           freeze
         end
