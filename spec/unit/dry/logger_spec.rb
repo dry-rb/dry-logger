@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
+require "date"
+
 RSpec.describe Dry::Logger do
   before do
-    allow(Time).to receive(:now).and_return(Time.parse("2017-01-15 16:00:23 +0100"))
+    allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
   end
 
-  describe "#initialize" do
-    it "returns a frozen instance of #{described_class}" do
-      expect(subject).to be_kind_of(described_class)
+  describe ".new" do
+    subject { described_class.new }
+
+    it "returns a frozen instance of a stream logger" do
+      expect(subject).to be_kind_of(Dry::Logger::Stream)
       expect(subject).to be_frozen
     end
 

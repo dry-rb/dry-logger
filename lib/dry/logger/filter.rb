@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require "logger"
-
 module Dry
-  class Logger < ::Logger
+  module Logger
     # Filtering logic
     # Originaly copied from hanami/utils (see Hanami::Logger)
     #

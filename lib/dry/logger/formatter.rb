@@ -8,7 +8,7 @@ require "logger"
 require "time"
 
 module Dry
-  class Logger < ::Logger
+  module Logger
     # Dry::Logger default formatter.
     # This formatter returns string in key=value format.
     # Originaly copied from hanami/utils (see Hanami::Logger)
