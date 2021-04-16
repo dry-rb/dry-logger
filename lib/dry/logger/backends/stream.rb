@@ -8,32 +8,22 @@ require "dry/logger/formatter"
 
 module Dry
   module Logger
-    class Stream < ::Logger
-      def initialize(stream: $stdout, level: INFO, formatter: nil, filters: [])
-        _safe_create_stream_directory(stream)
-        super(stream)
+    module Backends
+      class Stream < ::Logger
+        attr_reader :stream
 
-        @stream = stream
-        @level = Level[level]
+        attr_reader :level
 
-        self.formatter = Formatter.fabricate(formatter, filters)
-        freeze
-      end
+        def initialize(stream:, level: INFO, formatter: nil, filters: [])
+          super(stream)
 
-      def close
-        super if close?
-      end
+          @stream = stream
+          @level = Level[level]
 
-      private
+          self.formatter = Formatter.fabricate(formatter, filters)
 
-      def close?
-        ![STDOUT, $stdout].include?(@stream)
-      end
-
-      def _safe_create_stream_directory(stream)
-        Pathname.new(stream).dirname.mkpath
-      rescue TypeError
-        # if stream isn't a file, ignore TypeError
+          freeze
+        end
       end
     end
   end

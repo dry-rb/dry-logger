@@ -8,11 +8,14 @@ RSpec.describe Dry::Logger do
   end
 
   describe ".new" do
-    subject { described_class.new }
-
     it "returns a frozen instance of a stream logger" do
-      expect(subject).to be_kind_of(Dry::Logger::Stream)
+      subject = described_class.new
+      expect(subject).to be_kind_of(Dry::Logger::Backends::Stream)
       expect(subject).to be_frozen
+    end
+
+    it "raises on unsupported stream type" do
+      expect { described_class.new(stream: []) }.to raise_error(ArgumentError, /unsupported/)
     end
 
     context "stream" do
