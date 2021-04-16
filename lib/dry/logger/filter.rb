@@ -36,7 +36,11 @@ module Dry
       # @since 0.1.0
       # @api private
       def _filtered_keys(hash)
-        _key_paths(hash).select { |key| filters.any? { |filter| key =~ %r{(\.|\A)#{filter}(\.|\z)} } }
+        _key_paths(hash).select { |key|
+          filters.any? { |filter|
+            key =~ /(\.|\A)#{filter}(\.|\z)/
+          }
+        }
       end
 
       # @since 0.1.0

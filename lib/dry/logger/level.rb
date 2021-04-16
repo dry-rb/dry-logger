@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'logger'
+require "logger"
 
 module Dry
   class Logger < ::Logger
@@ -17,12 +17,12 @@ module Dry
       # @since 0.1.0
       # @api private
       LEVELS = ::Hash[
-        'debug' => DEBUG,
-        'info' => INFO,
-        'warn' => WARN,
-        'error' => ERROR,
-        'fatal' => FATAL,
-        'unknown' => UNKNOWN
+        "debug" => DEBUG,
+        "info" => INFO,
+        "warn" => WARN,
+        "error" => ERROR,
+        "fatal" => FATAL,
+        "unknown" => UNKNOWN
       ].freeze
 
       def self.call(level)
@@ -35,7 +35,7 @@ module Dry
       end
 
       class << self
-        alias [] call
+        alias_method :[], :call
       end
     end
   end

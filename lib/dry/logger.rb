@@ -32,7 +32,7 @@ module Dry
 
     def _safe_create_stream_directory(stream)
       Pathname.new(stream).dirname.mkpath
-    rescue TypeError # rubocop:disable Lint/HandleExceptions
+    rescue TypeError
       # if stream isn't a file, ignore TypeError
     end
   end

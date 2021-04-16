@@ -5,7 +5,7 @@ require "json"
 require "logger"
 
 # we need it for iso8601 method
-require 'time'
+require "time"
 
 module Dry
   class Logger < ::Logger
@@ -79,7 +79,7 @@ module Dry
       # @api private
       #
       # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html#method-i-call
-      def call(severity, time, progname, msg)
+      def call(_severity, _time, _progname, msg)
         _format(_message_hash(msg))
       end
 
@@ -87,15 +87,15 @@ module Dry
 
       # @since 0.1.0
       # @api private
-      def _message_hash(message) # rubocop:disable Metrics/MethodLength
+      def _message_hash(message)
         case message
         when Hash
           @filter.call(message)
         when Exception
           Hash[
-            message:   message.message,
+            message: message.message,
             backtrace: message.backtrace || [],
-            error:     message.class
+            error: message.class
           ]
         else
           Hash[message: message]
@@ -158,14 +158,15 @@ module Dry
         name == :application
       end
 
-      def call(severity, time, progname, msg)
+      def call(severity, time, _progname, msg)
         _format(severity: severity, time: time, **_message_hash(msg))
       end
 
       private
 
       def _format(hash)
-        "#{_line_front_matter(hash.delete(:severity), hash.delete(:time))}#{SEPARATOR}#{_format_message(hash)}"
+        "#{_line_front_matter(hash.delete(:severity),
+                              hash.delete(:time))}#{SEPARATOR}#{_format_message(hash)}"
       end
 
       # @since 0.1.0
@@ -186,7 +187,7 @@ module Dry
         name == :json
       end
 
-      def call(severity, time, progname, msg)
+      def call(severity, time, _progname, msg)
         _format(severity: severity, time: time, **_message_hash(msg))
       end
 

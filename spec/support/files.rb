@@ -10,7 +10,9 @@ module RSpec
 
       def generate_file(destination, contents)
         mkdir_p(destination)
-        File.open(destination, File::WRONLY | File::TRUNC | File::CREAT, 0o664) { |f| f.write(contents) }
+        File.open(destination, File::WRONLY | File::TRUNC | File::CREAT, 0o664) { |f|
+          f.write(contents)
+        }
       end
 
       def random_file_name(tmp: RELATIVE_TMP)
