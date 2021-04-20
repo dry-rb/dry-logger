@@ -3,37 +3,53 @@
 require "logger"
 require "pathname"
 
+require "dry/logger/level"
+
+require "dry/logger/backends/io"
+require "dry/logger/backends/file"
+
+require "dry/logger/formatters/string"
+require "dry/logger/formatters/json"
+require "dry/logger/formatters/application"
+
 module Dry
-  class Logger < ::Logger
-    require "dry/logger/version"
-    require "dry/logger/level"
-    require "dry/logger/formatter"
+  module Logger
+    include Level
 
-    def initialize(stream: $stdout, level: INFO, formatter: nil, filters: [])
-      _safe_create_stream_directory(stream)
-      super(stream)
-
-      @stream = stream
-      @level = Level[level]
-
-      self.formatter = Formatter.fabricate(formatter, filters)
-      freeze
+    def self.formatters
+      @formatters ||= {}
     end
 
-    def close
-      super if close?
+    def self.register_formatter(name, formatter)
+      formatters[name] = formatter
     end
 
-    private
+    register_formatter(:string, Formatters::String)
+    register_formatter(:json, Formatters::JSON)
+    register_formatter(:application, Formatters::Application)
 
-    def close?
-      ![STDOUT, $stdout].include?(@stream)
-    end
+    def self.new(stream: $stdout, **opts)
+      backend =
+        case stream
+        when IO, StringIO then Backends::IO
+        when String, Pathname then Backends::File
+        else
+          raise ArgumentError, "unsupported stream type #{stream.class}"
+        end
 
-    def _safe_create_stream_directory(stream)
-      Pathname.new(stream).dirname.mkpath
-    rescue TypeError
-      # if stream isn't a file, ignore TypeError
+      formatter_opt = opts[:formatter]
+
+      formatter =
+        case formatter_opt
+        when Symbol then formatters.fetch(formatter_opt).new(**opts)
+        when Class then formatter_opt.new(**opts)
+        when NilClass then formatters[:string].new(**opts)
+        when ::Logger::Formatter then formatter_opt
+        else
+          raise ArgumentError, "unsupported formatter option #{formatter_opt.inspect}"
+        end
+
+      backend.new(stream: stream, **opts, formatter: formatter)
     end
   end
 end

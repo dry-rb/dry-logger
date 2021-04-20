@@ -1,14 +1,22 @@
 # frozen_string_literal: true
 
+require "date"
+
 RSpec.describe Dry::Logger do
   before do
-    allow(Time).to receive(:now).and_return(Time.parse("2017-01-15 16:00:23 +0100"))
+    allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
   end
 
-  describe "#initialize" do
-    it "returns a frozen instance of #{described_class}" do
-      expect(subject).to be_kind_of(described_class)
+  describe ".new" do
+    let(:subject) { described_class.new }
+
+    it "returns a frozen instance of a stream logger" do
+      expect(subject).to be_kind_of(Dry::Logger::Backends::Stream)
       expect(subject).to be_frozen
+    end
+
+    it "raises on unsupported stream type" do
+      expect { described_class.new(stream: []) }.to raise_error(ArgumentError, /unsupported/)
     end
 
     context "stream" do
@@ -177,7 +185,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info("foo")
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info("foo")
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
@@ -185,7 +193,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for error messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).error(Exception.new("foo"))
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
       end
 
       expect(output).to eq %({"severity":"ERROR","time":"2017-01-15T15:00:23Z","message":"foo","backtrace":[],"error":"Exception"}\n)
@@ -193,7 +201,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for hash messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(foo: :bar)
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","foo":"bar"}\n)
@@ -201,7 +209,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for not string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::JSONFormatter.new).info(["foo"])
+        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":["foo"]}\n)

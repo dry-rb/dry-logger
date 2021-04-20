@@ -3,7 +3,7 @@
 require "logger"
 
 module Dry
-  class Logger < ::Logger
+  module Logger
     module Level
       DEBUG = ::Logger::DEBUG
       INFO = ::Logger::INFO
