@@ -60,15 +60,6 @@ jobs:
         with:
           project-token: ${{secrets.CODACY_PROJECT_TOKEN}}
           coverage-reports: coverage/coverage.xml
-  prerelease:
-    runs-on: ubuntu-latest
-    needs: tests
-    steps:
-      - name: Build and publish gem
-        uses: jstastny/publish-gem-to-github@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          owner: solnic
   release:
     runs-on: ubuntu-latest
     if: contains(github.ref, 'tags') && github.event_name == 'create'
