@@ -2,172 +2,167 @@
 
 require "date"
 
-RSpec.describe Dry::Logger do
+RSpec.describe "Dry.Logger" do
   before do
     allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
   end
 
-  describe ".new" do
-    let(:subject) { described_class.new }
+  it "raises on unsupported stream type" do
+    expect { Dry.Logger(:test, stream: []) }.to raise_error(ArgumentError, /unsupported/)
+  end
 
-    it "returns a frozen instance of a stream logger" do
-      expect(subject).to be_kind_of(Dry::Logger::Backends::Stream)
-      expect(subject).to be_frozen
+  context "default" do
+    subject(:logger) { Dry.Logger(:test) }
+
+    it "uses $stdout by default" do
+      message = "hello, world"
+
+      output = with_captured_stdout do
+        logger.info(message)
+      end
+
+      expect(output).to match(message)
     end
+  end
 
-    it "raises on unsupported stream type" do
-      expect { described_class.new(stream: []) }.to raise_error(ArgumentError, /unsupported/)
-    end
+  context "file" do
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
 
-    context "stream" do
-      it "uses $stdout by default" do
-        message = "hello, world"
-        output = with_captured_stdout do
-          subject.info(message)
-        end
+    context "relative path" do
+      let(:stream) { random_file_name }
 
-        expect(output).to match(message)
-      end
+      context "when file doesn't exist" do
+        it "creates file" do
+          logger
+          expect(stream).to be_exist
 
-      context "file" do
-        subject { described_class.new(stream: stream) }
-
-        context "relative path" do
-          let(:stream) { random_file_name }
-
-          context "when file doesn't exist" do
-            it "creates file" do
-              subject
-              expect(stream).to be_exist
-
-              subject.info(message = "newline")
-              expect(read(stream)).to match(message)
-            end
-          end
-
-          context "when file already exists" do
-            before do
-              generate_file(stream, existing_message)
-            end
-
-            let(:existing_message) { "existing" }
-
-            it "appends to file" do
-              subject.info(new_message = "appended")
-
-              expect(read(stream)).to match(existing_message)
-              expect(read(stream)).to match(new_message)
-            end
-          end
-        end
-
-        context "absolute path" do
-          let(:stream) { random_file_name(tmp: TMP) }
-
-          it "creates file" do
-            subject
-            expect(stream).to be_exist
-          end
-        end
-      end
-
-      context "when IO" do
-        subject { described_class.new(stream: stream) }
-
-        let(:stream) { io_stream(destination) }
-        let(:destination) { file_with_directory }
-
-        it "appends" do
-          subject.info(message = "foo")
-          subject.close
-
-          expect(read(destination)).to match(message)
-        end
-      end
-
-      context "when StringIO" do
-        subject { described_class.new(stream: stream) }
-        let(:stream) { StringIO.new }
-
-        it "appends" do
-          subject.info(message = "foo")
-
+          logger.info(message = "newline")
           expect(read(stream)).to match(message)
         end
       end
+
+      context "when file already exists" do
+        before do
+          generate_file(stream, existing_message)
+        end
+
+        let(:existing_message) { "existing" }
+
+        it "appends to file" do
+          logger.info(new_message = "appended")
+
+          expect(read(stream)).to match(existing_message)
+          expect(read(stream)).to match(new_message)
+        end
+      end
     end
 
-    context "log level" do
-      subject { described_class.new(level: level) }
+    context "absolute path" do
+      let(:stream) { random_file_name(tmp: TMP) }
 
-      it "uses INFO by default" do
-        expect(described_class.new.level).to eq(Dry::Logger::INFO)
+      it "creates file" do
+        logger
+        expect(stream).to be_exist
       end
+    end
+  end
 
-      context "when integer" do
-        let(:level) { 3 }
+  context "when IO" do
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
 
-        it "translates into level" do
-          expect(subject.level).to eq(Dry::Logger::ERROR)
-        end
+    let(:stream) { io_stream(destination) }
+    let(:destination) { file_with_directory }
+
+    it "appends" do
+      logger.info(message = "foo")
+      logger.close
+
+      expect(read(destination)).to match(message)
+    end
+  end
+
+  context "when StringIO" do
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
+
+    let(:stream) { StringIO.new }
+
+    it "appends" do
+      logger.info(message = "foo")
+
+      expect(read(stream)).to match(message)
+    end
+  end
+
+  context "log level" do
+    subject(:logger) { Dry.Logger(:test, level: level) }
+
+    it "uses INFO by default" do
+      expect(Dry.Logger(:test).level).to eq(Dry::Logger::INFO)
+    end
+
+    context "when integer" do
+      let(:level) { 3 }
+
+      it "translates into level" do
+        expect(logger.level).to eq(Dry::Logger::ERROR)
       end
+    end
 
-      context "when integer out of boundary" do
-        let(:level) { 99 }
+    context "when integer out of boundary" do
+      let(:level) { 99 }
 
-        it "sets level to default" do
-          expect(subject.level).to eq(Dry::Logger::INFO)
-        end
+      it "sets level to default" do
+        expect(logger.level).to eq(Dry::Logger::INFO)
       end
+    end
 
-      context "when symbol" do
-        let(:level) { :error }
+    context "when symbol" do
+      let(:level) { :error }
 
-        it "translates into level" do
-          expect(subject.level).to eq(Dry::Logger::ERROR)
-        end
+      it "translates into level" do
+        expect(logger.level).to eq(Dry::Logger::ERROR)
       end
+    end
 
-      context "when string" do
-        let(:level) { "error" }
+    context "when string" do
+      let(:level) { "error" }
 
-        it "translates into level" do
-          expect(subject.level).to eq(Dry::Logger::ERROR)
-        end
+      it "translates into level" do
+        expect(logger.level).to eq(Dry::Logger::ERROR)
       end
+    end
 
-      context "when uppercased string" do
-        let(:level) { "ERROR" }
+    context "when uppercased string" do
+      let(:level) { "ERROR" }
 
-        it "translates into level" do
-          expect(subject.level).to eq(Dry::Logger::ERROR)
-        end
+      it "translates into level" do
+        expect(logger.level).to eq(Dry::Logger::ERROR)
       end
+    end
 
-      context "when unknown level" do
-        let(:level) { "foo" }
+    context "when unknown level" do
+      let(:level) { "foo" }
 
-        it "sets level to default" do
-          expect(subject.level).to eq(Dry::Logger::INFO)
-        end
+      it "sets level to default" do
+        expect(logger.level).to eq(Dry::Logger::INFO)
       end
+    end
 
-      context "when constant" do
-        let(:level) { Dry::Logger::ERROR }
+    context "when constant" do
+      let(:level) { Dry::Logger::ERROR }
 
-        it "translates into level" do
-          expect(subject.level).to eq(Dry::Logger::ERROR)
-        end
+      it "translates into level" do
+        expect(logger.level).to eq(Dry::Logger::ERROR)
       end
     end
   end
 
   describe "with nil formatter" do
-    subject { described_class.new(formatter: nil) }
+    subject(:logger) { Dry.Logger(:test, formatter: nil) }
 
     it "falls back to Formatter" do
       output = with_captured_stdout do
-        subject.info("foo")
+        logger.info("foo")
       end
 
       expect(output).to eq "foo\n"
@@ -177,7 +172,7 @@ RSpec.describe Dry::Logger do
   describe "with JSON formatter" do
     it "when passed as a symbol, it has JSON format for string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: :json).info("foo")
+        Dry.Logger(:test, formatter: :json).info("foo")
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
@@ -185,7 +180,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info("foo")
+        Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info("foo")
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
@@ -193,7 +188,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for error messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
+        Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
       end
 
       expect(output).to eq %({"severity":"ERROR","time":"2017-01-15T15:00:23Z","message":"foo","backtrace":[],"error":"Exception"}\n)
@@ -201,7 +196,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for hash messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
+        Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","foo":"bar"}\n)
@@ -209,7 +204,7 @@ RSpec.describe Dry::Logger do
 
     it "has JSON format for not string messages" do
       output = with_captured_stdout do
-        described_class.new(formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
+        Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
       end
 
       expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":["foo"]}\n)
@@ -217,11 +212,11 @@ RSpec.describe Dry::Logger do
   end
 
   describe "with application formatter" do
-    subject { described_class.new(formatter: :application) }
+    subject(:logger) { Dry.Logger(:test, formatter: :application) }
 
     it "when passed as a symbol, it has key=value format for string messages" do
       output = with_captured_stdout do
-        subject.info("foo")
+        logger.info("foo")
       end
 
       expect(output).to eq "[INFO] [2017-01-15 16:00:23 +0100] foo\n"
@@ -229,7 +224,7 @@ RSpec.describe Dry::Logger do
 
     it "has key=value format for hash messages" do
       output = with_captured_stdout do
-        subject.info(foo: "bar")
+        logger.info(foo: "bar")
       end
 
       expect(output).to eq %([INFO] [2017-01-15 16:00:23 +0100] foo="bar"\n)
@@ -243,7 +238,7 @@ RSpec.describe Dry::Logger do
         rescue StandardError => e
           exc = e
         end
-        subject.error(exc)
+        logger.error(exc)
       end
 
       expectation = "[ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo\n"
@@ -273,13 +268,13 @@ RSpec.describe Dry::Logger do
       ]
     end
 
-    subject { described_class.new(formatter: :application, filters: filters) }
+    subject(:logger) { Dry.Logger(:test, formatter: :application, filters: filters) }
 
     it "filters values for keys in the filters array" do
       expected = %s({"password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]", "credit_card"=>{"number"=>"[FILTERED]", "name"=>"[FILTERED]"}, "user"=>{"login"=>"[FILTERED]", "name"=>"John"}})
 
       output = with_captured_stdout do
-        subject.info(params)
+        logger.info(params)
       end
 
       expect(output).to eq("[INFO] [2017-01-15 16:00:23 +0100] #{expected}\n")
@@ -288,10 +283,10 @@ RSpec.describe Dry::Logger do
 
   describe "#close" do
     before do
-      subject.close
+      logger.close
     end
 
-    subject { described_class.new(stream: stream) }
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
 
     context "when stream is $stdout" do
       let(:stream) { $stdout }
@@ -313,7 +308,7 @@ RSpec.describe Dry::Logger do
       let(:stream) { random_file_name }
 
       it "closes stream" do
-        subject.info(message = "foo")
+        logger.info(message = "foo")
 
         expect(read(stream)).to_not match(message)
       end
@@ -323,7 +318,7 @@ RSpec.describe Dry::Logger do
       let(:stream) { StringIO.new }
 
       it "closes stream" do
-        subject.info("foo")
+        logger.info("foo")
 
         expect { read(stream) }.to raise_error(IOError)
       end
@@ -334,8 +329,8 @@ RSpec.describe Dry::Logger do
       let(:destination) { file_with_directory }
 
       it "closes stream" do
-        subject.info(message = "foo")
-        subject.close
+        logger.info(message = "foo")
+        logger.close
 
         expect(read(destination)).to_not match(message)
       end

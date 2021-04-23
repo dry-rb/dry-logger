@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 require "logger"
-require "pathname"
 
-require "dry/logger/level"
+require "dry/logger/constants"
 
 module Dry
   module Logger
@@ -19,11 +18,11 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, level: INFO, formatter: nil, **)
+        def initialize(stream:, level: DEFAULT_LEVEL, formatter:)
           super(stream)
 
           @stream = stream
-          @level = Level[level]
+          @level = LEVELS[level]
 
           self.formatter = formatter
 
