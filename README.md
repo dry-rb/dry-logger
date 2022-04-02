@@ -11,7 +11,7 @@
 [![CI Status](https://github.com/dry-rb/dry-logger/workflows/ci/badge.svg)][actions]
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5aae4837b97044cfa4537f083ad584e9)][codacy]
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/5aae4837b97044cfa4537f083ad584e9)][codacy]
-[![Inline docs](http://inch-ci.org/github/dry-rb/dry-logger.svg?branch=master)][inchpages]
+[![Inline docs](http://inch-ci.org/github/dry-rb/dry-logger.svg?branch=main)][inchpages]
 
 ## Links
 
