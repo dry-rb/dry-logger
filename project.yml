@@ -4,7 +4,5 @@ gemspec:
   authors: ["Luca Guidi"]
   email: ["me@lucaguidi.com"]
   summary: "Logging for Ruby"
-  runtime_dependencies:
-    - ["dry-core", ">= 1.0.0.rc1", "< 2"]
   development_dependencies:
     - rspec

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
 require "logger"
-require "dry/core/constants"
 
 module Dry
   module Logger
-    include Dry::Core::Constants
-
     DEBUG = ::Logger::DEBUG
     INFO = ::Logger::INFO
     WARN = ::Logger::WARN

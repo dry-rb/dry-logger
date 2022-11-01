@@ -29,7 +29,5 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.7.0"
 
   # to update dependencies edit project.yml
-  spec.add_runtime_dependency "dry-core", ">= 1.0.0.rc1", "< 2"
-
   spec.add_development_dependency "rspec"
 end
