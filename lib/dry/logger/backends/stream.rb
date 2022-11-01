@@ -18,8 +18,8 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, level: DEFAULT_LEVEL, formatter:)
-          super(stream)
+        def initialize(stream:, level: DEFAULT_LEVEL, formatter:, progname: nil)
+          super(stream, progname: progname)
 
           @stream = stream
           @level = LEVELS[level]

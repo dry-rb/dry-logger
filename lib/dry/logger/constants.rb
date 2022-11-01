@@ -34,7 +34,7 @@ module Dry
       )
       .freeze
 
-    DEFAULT_OPTS = {level: DEFAULT_LEVEL, formatter: nil}.freeze
+    DEFAULT_OPTS = {level: DEFAULT_LEVEL, formatter: nil, progname: nil}.freeze
 
     BACKEND_OPT_KEYS = DEFAULT_OPTS.keys.freeze
     FORMATTER_OPT_KEYS = %i[filter].freeze

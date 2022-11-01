@@ -219,7 +219,7 @@ RSpec.describe "Dry.Logger" do
         logger.info("foo")
       end
 
-      expect(output).to eq "[INFO] [2017-01-15 16:00:23 +0100] foo\n"
+      expect(output).to eq "[test] [INFO] [2017-01-15 16:00:23 +0100] foo\n"
     end
 
     it "has key=value format for hash messages" do
@@ -227,7 +227,7 @@ RSpec.describe "Dry.Logger" do
         logger.info(foo: "bar")
       end
 
-      expect(output).to eq %([INFO] [2017-01-15 16:00:23 +0100] foo="bar"\n)
+      expect(output).to eq %([test] [INFO] [2017-01-15 16:00:23 +0100] foo="bar"\n)
     end
 
     it "has key=value format for error messages" do
@@ -241,7 +241,7 @@ RSpec.describe "Dry.Logger" do
         logger.error(exc)
       end
 
-      expectation = "[ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo\n"
+      expectation = "[test] [ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo\n"
       backtrace = exc.backtrace.map { |line| "from #{line}\n" }.join
 
       expect(output).to eq(expectation + backtrace)
@@ -277,7 +277,7 @@ RSpec.describe "Dry.Logger" do
         logger.info(params)
       end
 
-      expect(output).to eq("[INFO] [2017-01-15 16:00:23 +0100] #{expected}\n")
+      expect(output).to eq("[test] [INFO] [2017-01-15 16:00:23 +0100] #{expected}\n")
     end
   end
 

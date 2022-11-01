@@ -55,7 +55,7 @@ module Dry
         if opts.empty?
           new(id, backends: [Dry::Logger.new(**DEFAULT_OPTS)], **DEFAULT_OPTS)
         else
-          new(id, backends: [Dry::Logger.new(**opts)], **DEFAULT_OPTS, **opts)
+          new(id, backends: [Dry::Logger.new(progname: id, **opts)], **DEFAULT_OPTS, **opts)
         end
       end
 

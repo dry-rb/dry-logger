@@ -11,15 +11,16 @@ module Dry
       # @since 0.1.0
       # @api private
       class Application < String
-        def call(severity, time, _progname, msg)
-          _format(severity: severity, time: time, **_message_hash(msg))
+        def call(severity, time, progname, msg)
+          _format(progname: progname, severity: severity, time: time, **_message_hash(msg))
         end
 
         private
 
         def _format(hash)
-          "#{_line_front_matter(hash.delete(:severity),
-                                hash.delete(:time))}#{SEPARATOR}#{_format_message(hash)}"
+          "#{_line_front_matter(
+            hash.delete(:progname), hash.delete(:severity), hash.delete(:time)
+          )}#{SEPARATOR}#{_format_message(hash)}"
         end
 
         # @since 0.1.0
