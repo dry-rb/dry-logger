@@ -5,8 +5,6 @@ gemspec:
   email: ["me@lucaguidi.com"]
   summary: "Logging for Ruby"
   runtime_dependencies:
-    - ["dry-core", "~> 0.5"]
+    - ["dry-core", ">= 1.0.0.rc1", "< 2"]
   development_dependencies:
-    - bundler
-    - rake
     - rspec
