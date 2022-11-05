@@ -59,6 +59,8 @@ module Dry
         # @api private
         attr_reader :template
 
+        # @since 1.0.0
+        # @api private
         def initialize(filters: DEFAULT_FILTERS, template: DEFAULT_TEMPLATE, **)
           super()
           @filter = filters.equal?(DEFAULT_FILTERS) ? NOOP_FILTER : Filter.new(filters)
