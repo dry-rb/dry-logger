@@ -14,87 +14,96 @@ module Dry
       # This formatter returns string in key=value format.
       # Originaly copied from hanami/utils (see Hanami::Logger)
       #
-      # @since 0.1.0
+      # @since 1.0.0
       # @api private
       #
       # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html
       class String < ::Logger::Formatter
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         SEPARATOR = " "
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         NEW_LINE = $/
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
-        RESERVED_KEYS = %i[app severity time].freeze
+        RESERVED_KEYS = %i[progname severity time].freeze
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         HASH_SEPARATOR = ","
 
-        # @since 0.1.0
+        # @since 1.0.0
+        # @api private
+        DEFAULT_TEMPLATE = "%<message>s"
+
+        # @since 1.0.0
         # @api private
         attr_reader :filter
 
-        def initialize(filters: [], **)
+        # @since 1.0.0
+        # @api private
+        attr_reader :template
+
+        def initialize(filters: [], template: DEFAULT_TEMPLATE, **)
           super()
           @filter = Filter.new(filters)
+          @template = template
         end
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         #
         # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html#method-i-call
-        def call(_severity, _time, _progname, msg)
-          _format(_message_hash(msg))
+        def call(severity, time, progname, message)
+          _format(_message_hash(message, severity: severity, time: time, progname: progname))
         end
 
         private
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
-        def _message_hash(message)
+        def _message_hash(message, options)
           case message
           when Hash
-            filter.call(message)
+            filter.call(message).update(options)
           when Exception
-            Hash[
-              message: message.message,
-              backtrace: message.backtrace || [],
-              error: message.class
-            ]
+            {message: message.message,
+             backtrace: message.backtrace || [],
+             error: message.class,
+             **options}
           else
-            Hash[message: message]
+            {message: message, **options}
           end
         end
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         def _format(hash)
           _format_message(hash)
         end
 
-        # @since 0.1.0
-        # @api private
-        def _line_front_matter(*args)
-          args.map { |string| "[#{string}]" }.join(SEPARATOR)
-        end
-
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         def _format_message(hash)
-          if hash.key?(:error)
-            _format_error(hash)
-          elsif hash.key?(:params)
-            "#{hash.values.join(SEPARATOR)}#{NEW_LINE}"
-          else
-            "#{_format_params(hash[:message] || hash)}#{NEW_LINE}"
-          end
+          entry =
+            if hash.key?(:error)
+              template % _build_entry_hash(hash, _format_error(hash))
+            elsif hash.key?(:params)
+              template % _build_entry_hash(hash,
+                                           _exclude_reserved_keys(hash).values.join(SEPARATOR))
+            elsif hash.key?(:message)
+              template % hash
+            else
+              template % _build_entry_hash(hash, _format_params(_exclude_reserved_keys(hash)))
+            end
+
+          "#{entry}#{NEW_LINE}"
         end
 
+        # @api private
         def _format_params(params)
           case params
           when ::Hash
@@ -104,15 +113,23 @@ module Dry
           end
         end
 
-        # @since 0.1.0
+        # @since 1.0.0
         # @api private
         def _format_error(hash)
-          result = [hash[:error], hash[:message]].compact.join(": ").concat(NEW_LINE)
-          hash[:backtrace].each do |line|
-            result << "from #{line}#{NEW_LINE}"
-          end
+          result = hash.values_at(:error, :message).compact.join(": ")
+          "#{result}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
+        end
 
-          result
+        # @since 1.0.0
+        # @api private
+        def _build_entry_hash(hash, message)
+          hash.slice(*RESERVED_KEYS).update(message: message)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def _exclude_reserved_keys(hash)
+          (hash.keys - RESERVED_KEYS).to_h { |key| [key, hash[key]] }
         end
       end
     end
