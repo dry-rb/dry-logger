@@ -175,7 +175,12 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: :json).info("foo")
       end
 
-      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "INFO",
+        "time" => "2017-01-15T15:00:23Z",
+        "message" => "foo"
+      )
     end
 
     it "has JSON format for string messages" do
@@ -183,7 +188,12 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info("foo")
       end
 
-      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":"foo"}\n)
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "INFO",
+        "time" => "2017-01-15T15:00:23Z",
+        "message" => "foo"
+      )
     end
 
     it "has JSON format for error messages" do
@@ -191,7 +201,14 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
       end
 
-      expect(output).to eq %({"severity":"ERROR","time":"2017-01-15T15:00:23Z","message":"foo","backtrace":[],"error":"Exception"}\n)
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "ERROR",
+        "time" => "2017-01-15T15:00:23Z",
+        "message" => "foo",
+        "backtrace" => [],
+        "error" => "Exception"
+      )
     end
 
     it "has JSON format for hash messages" do
@@ -199,7 +216,12 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
       end
 
-      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","foo":"bar"}\n)
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "INFO",
+        "time" => "2017-01-15T15:00:23Z",
+        "foo" => "bar"
+      )
     end
 
     it "has JSON format for not string messages" do
@@ -207,12 +229,19 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
       end
 
-      expect(output).to eq %({"severity":"INFO","time":"2017-01-15T15:00:23Z","message":["foo"]}\n)
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "INFO",
+        "time" => "2017-01-15T15:00:23Z",
+        "message" => ["foo"]
+      )
     end
   end
 
-  describe "with application formatter" do
-    subject(:logger) { Dry.Logger(:test, formatter: :application) }
+  describe "with string formatter with customized log template" do
+    subject(:logger) do
+      Dry.Logger(:test, template: "[%<progname>s] [%<severity>s] [%<time>s] %<message>s")
+    end
 
     it "when passed as a symbol, it has key=value format for string messages" do
       output = with_captured_stdout do
@@ -232,12 +261,14 @@ RSpec.describe "Dry.Logger" do
 
     it "has key=value format for error messages" do
       exc = nil
+
+      begin
+        raise StandardError, "foo"
+      rescue StandardError => e
+        exc = e
+      end
+
       output = with_captured_stdout do
-        begin
-          raise StandardError, "foo"
-        rescue StandardError => e
-          exc = e
-        end
         logger.error(exc)
       end
 
@@ -268,7 +299,14 @@ RSpec.describe "Dry.Logger" do
       ]
     end
 
-    subject(:logger) { Dry.Logger(:test, formatter: :application, filters: filters) }
+    subject(:logger) do
+      Dry.Logger(
+        :test,
+        formatter: :string,
+        template: "[%<progname>s] [%<severity>s] [%<time>s] %<message>s",
+        filters: filters
+      )
+    end
 
     it "filters values for keys in the filters array" do
       expected = %s({"password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]", "credit_card"=>{"number"=>"[FILTERED]", "name"=>"[FILTERED]"}, "user"=>{"login"=>"[FILTERED]", "name"=>"John"}})

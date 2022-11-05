@@ -5,7 +5,6 @@ require "dry/logger/dispatcher"
 
 require "dry/logger/formatters/string"
 require "dry/logger/formatters/json"
-require "dry/logger/formatters/application"
 
 module Dry
   module Logger
@@ -19,6 +18,5 @@ module Dry
 
     register_formatter(:string, Formatters::String)
     register_formatter(:json, Formatters::JSON)
-    register_formatter(:application, Formatters::Application)
   end
 end

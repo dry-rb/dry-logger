@@ -13,10 +13,6 @@ module Dry
       # @since 0.1.0
       # @api private
       class JSON < Formatters::String
-        def call(severity, time, _progname, msg)
-          _format(severity: severity, time: time, **_message_hash(msg))
-        end
-
         private
 
         # @since 0.1.0
