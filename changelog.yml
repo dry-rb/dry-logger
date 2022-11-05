@@ -1,2 +1,12 @@
-- version: "unreleased"
-  date:
+---
+- version: unreleased
+  summary: 
+  date: 
+  fixed: 
+  added: &1
+  - 'Support for providing a string template for log entries via `template` option
+    (via #7) (@solnic)'
+  changed: 
+- version: unreleased
+  date: 
+  added: *1
