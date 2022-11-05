@@ -91,15 +91,18 @@ module Dry
         # @since 1.0.0
         # @api private
         def _format_message(hash)
-          if hash.key?(:error)
-            template % hash.slice(*RESERVED_KEYS).update(message: _format_error(hash))
-          elsif hash.key?(:params)
-            "#{template % hash.slice(*RESERVED_KEYS).update(message: hash.except(*RESERVED_KEYS).values.join(SEPARATOR))}#{NEW_LINE}"
-          elsif hash.key?(:message)
-            "#{template % hash}#{NEW_LINE}"
-          else
-            "#{template % hash.slice(*RESERVED_KEYS).update(message: _format_params(hash.except(*RESERVED_KEYS)))}#{NEW_LINE}"
-          end
+          entry =
+            if hash.key?(:error)
+              template % hash.slice(*RESERVED_KEYS).update(message: _format_error(hash))
+            elsif hash.key?(:params)
+              template % hash.slice(*RESERVED_KEYS).update(message: hash.except(*RESERVED_KEYS).values.join(SEPARATOR))
+            elsif hash.key?(:message)
+              template % hash
+            else
+              template % hash.slice(*RESERVED_KEYS).update(message: _format_params(hash.except(*RESERVED_KEYS)))
+            end
+
+          "#{entry}#{NEW_LINE}"
         end
 
         # @api private
@@ -115,13 +118,8 @@ module Dry
         # @since 1.0.0
         # @api private
         def _format_error(hash)
-          result = hash.values_at(:error, :message).compact.join(": ").concat(NEW_LINE)
-
-          hash[:backtrace].each do |line|
-            result << "from #{line}#{NEW_LINE}"
-          end
-
-          result
+          result = hash.values_at(:error, :message).compact.join(": ")
+          "#{result}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
         end
       end
     end
