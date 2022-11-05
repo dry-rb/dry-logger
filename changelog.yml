@@ -1,12 +1,8 @@
 ---
 - version: unreleased
-  summary: 
-  date: 
-  fixed: 
-  added: &1
-  - 'Support for providing a string template for log entries via `template` option
-    (via #7) (@solnic)'
-  changed: 
-- version: unreleased
-  date: 
-  added: *1
+  date:
+  summary: |
+    This is a port of the original Hanami logger from hanami-utils extended with support for logging
+    dispatchers that can log to different destinations.
+  added:
+  - 'Support for providing a string template for log entries via `template` option (via #7) (@solnic)'
