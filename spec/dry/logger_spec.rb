@@ -334,11 +334,11 @@ RSpec.describe "Dry.Logger" do
       end
     end
 
-    context "when stream is STDOUT" do
-      let(:stream) { STDOUT }
+    context "when stream is $stdout" do
+      let(:stream) { $stdout }
 
       it "does not close stream" do
-        expect { print "in STDOUT" }.to output("in STDOUT").to_stdout
+        expect { print "in $stdout" }.to output("in $stdout").to_stdout
       end
     end
 
