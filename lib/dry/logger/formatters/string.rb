@@ -66,20 +66,17 @@ module Dry
         # @since 1.0.0
         # @api private
         def _message_hash(message, options)
-          result =
-            case message
-            when Hash
-              filter.call(message).update(options)
-            when Exception
-              Hash[
-                message: message.message,
-                backtrace: message.backtrace || [],
-                error: message.class,
-                **options
-              ]
-            else
-              Hash[message: message, **options]
-            end
+          case message
+          when Hash
+            filter.call(message).update(options)
+          when Exception
+            {message: message.message,
+             backtrace: message.backtrace || [],
+             error: message.class,
+             **options}
+          else
+            {message: message, **options}
+          end
         end
 
         # @since 1.0.0
@@ -95,7 +92,8 @@ module Dry
             if hash.key?(:error)
               template % _build_entry_hash(hash, _format_error(hash))
             elsif hash.key?(:params)
-              template % _build_entry_hash(hash, _exclude_reserved_keys(hash).values.join(SEPARATOR))
+              template % _build_entry_hash(hash,
+                                           _exclude_reserved_keys(hash).values.join(SEPARATOR))
             elsif hash.key?(:message)
               template % hash
             else
@@ -131,7 +129,7 @@ module Dry
         # @since 1.0.0
         # @api private
         def _exclude_reserved_keys(hash)
-          (hash.keys - RESERVED_KEYS).map { |key| [key, hash[key]] }.to_h
+          (hash.keys - RESERVED_KEYS).to_h { |key| [key, hash[key]] }
         end
       end
     end
