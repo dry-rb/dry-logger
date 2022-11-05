@@ -6,6 +6,11 @@ require "pathname"
 require "fileutils"
 require "securerandom"
 
+begin
+  require "byebug"
+rescue LoadError
+end
+
 SPEC_ROOT = Pathname(__FILE__).dirname
 
 RELATIVE_TMP = File.join(".", "tmp")
