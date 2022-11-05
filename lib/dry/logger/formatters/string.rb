@@ -93,13 +93,13 @@ module Dry
         def _format_message(hash)
           entry =
             if hash.key?(:error)
-              template % hash.slice(*RESERVED_KEYS).update(message: _format_error(hash))
+              template % _build_entry_hash(hash, _format_error(hash))
             elsif hash.key?(:params)
-              template % hash.slice(*RESERVED_KEYS).update(message: hash.except(*RESERVED_KEYS).values.join(SEPARATOR))
+              template % _build_entry_hash(hash, _exclude_reserved_keys(hash).values.join(SEPARATOR))
             elsif hash.key?(:message)
               template % hash
             else
-              template % hash.slice(*RESERVED_KEYS).update(message: _format_params(hash.except(*RESERVED_KEYS)))
+              template % _build_entry_hash(hash, _format_params(_exclude_reserved_keys(hash)))
             end
 
           "#{entry}#{NEW_LINE}"
@@ -120,6 +120,18 @@ module Dry
         def _format_error(hash)
           result = hash.values_at(:error, :message).compact.join(": ")
           "#{result}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
+        end
+
+        # @since 1.0.0
+        # @api private
+        def _build_entry_hash(hash, message)
+          hash.slice(*RESERVED_KEYS).update(message: message)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def _exclude_reserved_keys(hash)
+          (hash.keys - RESERVED_KEYS).map { |key| [key, hash[key]] }.to_h
         end
       end
     end
