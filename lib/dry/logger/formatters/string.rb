@@ -41,15 +41,27 @@ module Dry
 
         # @since 1.0.0
         # @api private
+        DEFAULT_FILTERS = [].freeze
+
+        # @since 1.0.0
+        # @api private
+        NOOP_FILTER = -> message { message }
+
+        # @since 1.0.0
+        # @api private
+        EMPTY_BACKTRACE = [].freeze
+
+        # @since 1.0.0
+        # @api private
         attr_reader :filter
 
         # @since 1.0.0
         # @api private
         attr_reader :template
 
-        def initialize(filters: [], template: DEFAULT_TEMPLATE, **)
+        def initialize(filters: DEFAULT_FILTERS, template: DEFAULT_TEMPLATE, **)
           super()
-          @filter = Filter.new(filters)
+          @filter = filters.equal?(DEFAULT_FILTERS) ? NOOP_FILTER : Filter.new(filters)
           @template = template
         end
 
@@ -71,7 +83,7 @@ module Dry
             filter.call(message).update(options)
           when Exception
             {message: message.message,
-             backtrace: message.backtrace || [],
+             backtrace: message.backtrace || EMPTY_BACKTRACE,
              error: message.class,
              **options}
           else
