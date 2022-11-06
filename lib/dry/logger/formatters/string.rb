@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-require "logger"
-
-# we need it for iso8601 method
-require "time"
-
-require "dry/logger/filter"
+require "dry/logger/formatters/structured"
 
 module Dry
   module Logger
@@ -18,7 +13,7 @@ module Dry
       # @api private
       #
       # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html
-      class String < ::Logger::Formatter
+      class String < Structured
         # @since 1.0.0
         # @api private
         SEPARATOR = " "
@@ -41,34 +36,13 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        DEFAULT_FILTERS = [].freeze
-
-        # @since 1.0.0
-        # @api private
-        NOOP_FILTER = -> message { message }
-
-        # @since 1.0.0
-        # @api private
-        attr_reader :filter
-
-        # @since 1.0.0
-        # @api private
         attr_reader :template
 
         # @since 1.0.0
         # @api private
-        def initialize(filters: DEFAULT_FILTERS, template: DEFAULT_TEMPLATE, **)
-          super()
-          @filter = filters.equal?(DEFAULT_FILTERS) ? NOOP_FILTER : Filter.new(filters)
+        def initialize(template: DEFAULT_TEMPLATE, **options)
+          super(**options)
           @template = template
-        end
-
-        # @since 1.0.0
-        # @api private
-        #
-        # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html#method-i-call
-        def call(_severity, _time, _progname, entry)
-          format(entry.filter(filter))
         end
 
         private

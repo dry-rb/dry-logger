@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
-
-require "dry/logger/formatters/string"
+require "dry/logger/formatters/structured"
 
 module Dry
   module Logger
@@ -12,10 +11,10 @@ module Dry
       #
       # @since 0.1.0
       # @api private
-      class JSON < Formatters::String
+      class JSON < Structured
         # @since 0.1.0
         # @api private
-        def call(_severity, _time, _progname, entry)
+        def format(entry)
           ::JSON.generate(entry.as_json)
         end
       end
