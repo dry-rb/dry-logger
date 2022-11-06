@@ -15,7 +15,7 @@ module Dry
         # @since 0.1.0
         # @api private
         def format(entry)
-          ::JSON.generate(entry.as_json)
+          "#{::JSON.generate(entry.as_json)}#{NEW_LINE}"
         end
       end
     end

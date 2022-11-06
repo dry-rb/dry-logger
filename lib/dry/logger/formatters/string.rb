@@ -20,10 +20,6 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        NEW_LINE = $/
-
-        # @since 1.0.0
-        # @api private
         HASH_SEPARATOR = ","
 
         # @since 1.0.0

@@ -175,12 +175,15 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: :json).info("foo")
       end
 
-      expect(JSON.parse(output)).to eql(
+      expected_json = {
         "progname" => "test",
         "severity" => "INFO",
         "time" => "2017-01-15T15:00:23Z",
         "message" => "foo"
-      )
+      }
+
+      expect(output).to eql("#{JSON.dump(expected_json)}\n")
+      expect(JSON.parse(output)).to eql(expected_json)
     end
 
     it "has JSON format for string messages" do
