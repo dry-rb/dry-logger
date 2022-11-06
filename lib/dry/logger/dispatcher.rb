@@ -6,45 +6,12 @@ require "pathname"
 require "dry/logger/constants"
 require "dry/logger/entry"
 
-require "dry/logger/backends/io"
-require "dry/logger/backends/file"
-
 module Dry
-  def self.Logger(id, **opts, &block)
-    Logger::Dispatcher.setup(id, **opts, &block)
-  end
-
   module Logger
-    LOG_METHODS = %i[debug error fatal info warn].freeze
-
-    BACKEND_METHODS = %i[close].freeze
-
-    def self.new(stream: $stdout, **opts)
-      backend =
-        case stream
-        when IO, StringIO then Backends::IO
-        when String, Pathname then Backends::File
-        else
-          raise ArgumentError, "unsupported stream type #{stream.class}"
-        end
-
-      formatter_opt = opts[:formatter]
-
-      formatter =
-        case formatter_opt
-        when Symbol then formatters.fetch(formatter_opt).new(**opts)
-        when Class then formatter_opt.new(**opts)
-        when NilClass then formatters[:string].new(**opts)
-        when ::Logger::Formatter then formatter_opt
-        else
-          raise ArgumentError, "unsupported formatter option #{formatter_opt.inspect}"
-        end
-
-      backend_opts = opts.select { |key, _| BACKEND_OPT_KEYS.include?(key) }
-
-      backend.new(stream: stream, **backend_opts, formatter: formatter)
-    end
-
+    # Logger dispatcher routes log entries to configured logging backends
+    #
+    # @since 1.0.0
+    # @api public
     class Dispatcher
       attr_reader :id
 
