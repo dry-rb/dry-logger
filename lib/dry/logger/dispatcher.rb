@@ -4,6 +4,7 @@ require "logger"
 require "pathname"
 
 require "dry/logger/constants"
+require "dry/logger/entry"
 
 require "dry/logger/backends/io"
 require "dry/logger/backends/file"
@@ -81,14 +82,14 @@ module Dry
         LEVELS[opts[:level]]
       end
 
-      def call(meth, *args)
+      def call(meth, ...)
         backends.each do |backend|
-          backend.public_send(meth, *args)
+          backend.public_send(meth, ...)
         end
       end
 
-      def log(meth, *args)
-        call(meth, *args)
+      def log(meth, ...)
+        call(meth, Entry.build(id, meth, ...))
         true
       end
 

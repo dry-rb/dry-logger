@@ -29,11 +29,11 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        RESERVED_KEYS = %i[progname severity time].freeze
+        HASH_SEPARATOR = ","
 
         # @since 1.0.0
         # @api private
-        HASH_SEPARATOR = ","
+        EXCEPTION_SEPARATOR = ": "
 
         # @since 1.0.0
         # @api private
@@ -46,10 +46,6 @@ module Dry
         # @since 1.0.0
         # @api private
         NOOP_FILTER = -> message { message }
-
-        # @since 1.0.0
-        # @api private
-        EMPTY_BACKTRACE = [].freeze
 
         # @since 1.0.0
         # @api private
@@ -71,79 +67,47 @@ module Dry
         # @api private
         #
         # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html#method-i-call
-        def call(severity, time, progname, message)
-          _format(_message_hash(message, severity: severity, time: time, progname: progname))
+        def call(_severity, _time, _progname, entry)
+          format(entry.filter(filter))
         end
 
         private
 
         # @since 1.0.0
         # @api private
-        def _message_hash(message, options)
-          case message
-          when Hash
-            filter.call(message).update(options)
-          when Exception
-            {message: message.message,
-             backtrace: message.backtrace || EMPTY_BACKTRACE,
-             error: message.class,
-             **options}
+        def format(entry)
+          "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_entry(entry)
+          if entry.exception?
+            format_exception(entry)
+          # TODO: this should not be here. params is a very web-centric concept and should have its
+          #       own formatter
+          elsif entry.params?
+            entry[:params]
+          # TODO: there's no scenario for messages AND payload in specs yet
+          elsif entry.message
+            entry.message
           else
-            {message: message, **options}
+            format_payload(entry)
           end
         end
 
         # @since 1.0.0
         # @api private
-        def _format(hash)
-          _format_message(hash)
+        def format_exception(entry)
+          hash = entry.payload
+          message = hash.values_at(:error, :message).compact.join(EXCEPTION_SEPARATOR)
+          "#{message}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
         end
 
         # @since 1.0.0
         # @api private
-        def _format_message(hash)
-          entry =
-            if hash.key?(:error)
-              template % _build_entry_hash(hash, _format_error(hash))
-            elsif hash.key?(:params)
-              template % _build_entry_hash(hash,
-                                           _exclude_reserved_keys(hash).values.join(SEPARATOR))
-            elsif hash.key?(:message)
-              template % hash
-            else
-              template % _build_entry_hash(hash, _format_params(_exclude_reserved_keys(hash)))
-            end
-
-          "#{entry}#{NEW_LINE}"
-        end
-
-        # @api private
-        def _format_params(params)
-          case params
-          when ::Hash
-            params.map { |key, value| "#{key}=#{value.inspect}" }.join(HASH_SEPARATOR)
-          else
-            params.to_s
-          end
-        end
-
-        # @since 1.0.0
-        # @api private
-        def _format_error(hash)
-          result = hash.values_at(:error, :message).compact.join(": ")
-          "#{result}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
-        end
-
-        # @since 1.0.0
-        # @api private
-        def _build_entry_hash(hash, message)
-          hash.slice(*RESERVED_KEYS).update(message: message)
-        end
-
-        # @since 1.0.0
-        # @api private
-        def _exclude_reserved_keys(hash)
-          (hash.keys - RESERVED_KEYS).to_h { |key| [key, hash[key]] }
+        def format_payload(entry)
+          entry.map { |key, value| "#{key}=#{value.inspect}" }.join(HASH_SEPARATOR)
         end
       end
     end
