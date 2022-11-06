@@ -88,8 +88,14 @@ module Dry
         end
       end
 
-      def log(meth, ...)
-        call(meth, Entry.build(id, meth, ...))
+      def log(severity, message = nil, **payload)
+        case message
+        when String, Symbol, Array, Exception
+          call(severity, Entry.new(progname: id, severity: severity, message: message, payload: payload))
+        when Hash
+          call(severity, Entry.new(progname: id, severity: severity, payload: message))
+        end
+
         true
       end
 

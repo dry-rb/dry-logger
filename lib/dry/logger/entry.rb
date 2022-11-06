@@ -19,34 +19,6 @@ module Dry
       EMPTY_BACKTRACE = [].freeze
 
       # @since 1.0.0
-      # @api private
-      def self.build(progname, severity, ...)
-        new(progname: progname, severity: severity, message: message(...), payload: payload(...))
-      end
-
-      # @since 1.0.0
-      # @api private
-      def self.message(*args, **)
-        case (value = args[0])
-        when String, Array, Symbol, Exception then value
-        when Hash then nil
-        else
-          raise ArgumentError, "+#{value}+ must be either a String or a Hash (#{value.class} given)"
-        end
-      end
-
-      # @since 1.0.0
-      # @api private
-      def self.payload(*args, **payload)
-        case (value = args[0])
-        when String then EMPTY_PAYLOAD
-        when Hash then value
-        else
-          payload
-        end
-      end
-
-      # @since 1.0.0
       # @api public
       attr_reader :progname
 
@@ -69,7 +41,7 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(progname:, severity:, time: Time.now, message:, payload:)
+      def initialize(progname:, severity:, time: Time.now, message: nil, payload: EMPTY_PAYLOAD)
         @progname = progname
         @severity = severity.to_s.upcase # TODO: this doesn't feel right
         @time = time
