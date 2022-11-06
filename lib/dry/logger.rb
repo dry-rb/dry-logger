@@ -30,7 +30,7 @@ module Dry
   #   logger.warn("Ooops!")
   #   # [WARN][2022-11-06 10:55:57 +0100] Ooops!
   #
-  #   logger.warn("Gaaah!")
+  #   logger.error("Gaaah!")
   #   # [ERROR][2022-11-06 10:55:57 +0100] Gaaah!
   #
   # @example Basic $stdout JSON logger
