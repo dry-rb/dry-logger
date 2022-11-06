@@ -4,6 +4,7 @@ require "dry/logger/constants"
 require "dry/logger/dispatcher"
 
 require "dry/logger/formatters/string"
+require "dry/logger/formatters/params"
 require "dry/logger/formatters/json"
 
 require "dry/logger/backends/io"
@@ -106,6 +107,7 @@ module Dry
     end
 
     register_formatter(:string, Formatters::String)
+    register_formatter(:params, Formatters::Params)
     register_formatter(:json, Formatters::JSON)
   end
 end

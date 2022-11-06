@@ -54,10 +54,6 @@ module Dry
         def format_entry(entry)
           if entry.exception?
             format_exception(entry)
-          # TODO: this should not be here. params is a very web-centric concept and should have its
-          #       own formatter
-          elsif entry.params?
-            entry[:params]
           # TODO: there's no scenario for messages AND payload in specs yet
           elsif entry.message
             entry.message

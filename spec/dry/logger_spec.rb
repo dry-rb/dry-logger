@@ -282,7 +282,7 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
-  describe "with filters" do
+  describe "with filters and params" do
     let(:filters) { %w[password password_confirmation credit_card user.login] }
 
     let(:params) do
@@ -305,7 +305,7 @@ RSpec.describe "Dry.Logger" do
     subject(:logger) do
       Dry.Logger(
         :test,
-        formatter: :string,
+        formatter: :params,
         template: "[%<progname>s] [%<severity>s] [%<time>s] %<message>s",
         filters: filters
       )

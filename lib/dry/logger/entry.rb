@@ -69,8 +69,8 @@ module Dry
 
       # @since 1.0.0
       # @api public
-      def params?
-        payload.key?(:params)
+      def key?(name)
+        payload.key?(name)
       end
 
       # @since 1.0.0
