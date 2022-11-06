@@ -12,21 +12,32 @@ require "dry/logger/backends/file"
 module Dry
   # Set up a logger dispatcher
   #
-  # @example
-  # .  logger = Dry.Logger(:my_app)
-  #    logger.info("Hello World!")
-  #    # Hello World!
+  # @example Basic $stdout string logger
+  #   logger = Dry.Logger(:my_app)
   #
-  # .  logger = Dry.Logger(:my_app, formatter: :string, template: "[%<severity>][%<time>s] %<message>s")
+  #   logger.info("Hello World!")
+  #   # Hello World!
   #
-  #    logger.info("Hello World!")
-  #    # [INFO][2022-11-06 10:55:12 +0100] Hello World!
+  # @example Customized $stdout string logger
+  #   logger = Dry.Logger(:my_app, template: "[%<severity>][%<time>s] %<message>s")
   #
-  #    logger.warn("Ooops!")
-  #    # [WARN][2022-11-06 10:55:57 +0100] Ooops!
+  #   logger.info("Hello World!")
+  #   # [INFO][2022-11-06 10:55:12 +0100] Hello World!
   #
-  #    logger.warn("Gaaah!")
-  #    # [ERROR][2022-11-06 10:55:57 +0100] Gaaah!
+  #   logger.info(Hello: "World!")
+  #   # [INFO][2022-11-06 10:55:14 +0100] Hello="World!"
+  #
+  #   logger.warn("Ooops!")
+  #   # [WARN][2022-11-06 10:55:57 +0100] Ooops!
+  #
+  #   logger.warn("Gaaah!")
+  #   # [ERROR][2022-11-06 10:55:57 +0100] Gaaah!
+  #
+  # @example Basic $stdout JSON logger
+  #   logger = Dry.Logger(:my_app, formatter: :json)
+  #
+  #   logger.info(Hello: "World!")
+  #   # {"progname":"my_app","severity":"INFO","time":"2022-11-06T10:11:29Z","Hello":"World!"}
   #
   # @since 1.0.0
   # @return [Dispatcher]
@@ -42,8 +53,8 @@ module Dry
     #   class MyFormatter < Dry::Logger::Formatters::Structured
     #     def format(entry)
     #       "WOAH: #{entry.message}"
-    # .   end
-    # . end
+    #     end
+    #   end
     #
     #   Dry::Logger.register_formatter(MyFormatter)
     #
