@@ -33,7 +33,7 @@ module Dry
       # @since 1.0.0
       # @api public
       attr_reader :message
-      alias exception message
+      alias_method :exception, :message
 
       # @since 1.0.0
       # @api public
@@ -119,7 +119,6 @@ module Dry
           payload
         end
       end
-
     end
   end
 end

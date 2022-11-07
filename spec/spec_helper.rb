@@ -43,7 +43,6 @@ end
 
 require "dry/logger"
 
-require "pathname"
-Dir.glob(Pathname.new(__dir__).join("support", "**", "*.rb")).each do |file|
+Dir.glob(Pathname.new(__dir__).join("support", "**", "*.rb")).sort.each do |file|
   require_relative file
 end

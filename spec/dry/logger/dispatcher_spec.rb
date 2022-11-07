@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "dry/logger/dispatcher"
 
 RSpec.describe Dry::Logger::Dispatcher do

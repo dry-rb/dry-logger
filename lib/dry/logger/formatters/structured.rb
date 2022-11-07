@@ -25,7 +25,7 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        NEW_LINE = $/
+        NEW_LINE = $/ # rubocop:disable Style/SpecialGlobalVars
 
         # @since 1.0.0
         # @api private

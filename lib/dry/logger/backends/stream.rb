@@ -18,7 +18,7 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, level: DEFAULT_LEVEL, formatter:, progname: nil)
+        def initialize(stream:, formatter:, level: DEFAULT_LEVEL, progname: nil)
           super(stream, progname: progname)
 
           @stream = stream

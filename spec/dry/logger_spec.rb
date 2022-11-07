@@ -286,20 +286,20 @@ RSpec.describe "Dry.Logger" do
     let(:filters) { %w[password password_confirmation credit_card user.login] }
 
     let(:params) do
-      Hash[
-        params: Hash[
+      {
+        params: {
           "password" => "password",
           "password_confirmation" => "password",
-          "credit_card" => Hash[
+          "credit_card" => {
             "number" => "4545 4545 4545 4545",
             "name" => "John Citizen"
-          ],
-          "user" => Hash[
+          },
+          "user" => {
             "login" => "John",
             "name" => "John"
-          ]
-        ]
-      ]
+          }
+        }
+      }
     end
 
     subject(:logger) do
@@ -312,7 +312,18 @@ RSpec.describe "Dry.Logger" do
     end
 
     it "filters values for keys in the filters array" do
-      expected = %s({"password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]", "credit_card"=>{"number"=>"[FILTERED]", "name"=>"[FILTERED]"}, "user"=>{"login"=>"[FILTERED]", "name"=>"John"}})
+      expected = {
+        "password" => "[FILTERED]",
+        "password_confirmation" => "[FILTERED]",
+        "credit_card" => {
+          "number" => "[FILTERED]",
+          "name" => "[FILTERED]"
+        },
+        "user" => {
+          "login" => "[FILTERED]",
+          "name" => "John"
+        }
+      }
 
       output = with_captured_stdout do
         logger.info(params)
