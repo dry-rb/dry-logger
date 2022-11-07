@@ -5,6 +5,20 @@ require "dry/logger/dispatcher"
 RSpec.describe Dry::Logger::Dispatcher do
   include_context "stream"
 
+  Dry::Logger::LEVELS.each_key do |level|
+    describe "##{level}" do
+      subject(:logger) { Dry.Logger(:test, stream: stream, level: level) }
+
+      it "logs a text message with a corresponding severity" do
+        message = "Hello World!"
+
+        logger.public_send(level, message)
+
+        expect(stream).to include(message)
+      end
+    end
+  end
+
   describe "#add_backend" do
     subject(:logger) { Dry.Logger(:test, stream: stream) }
 

@@ -3,6 +3,10 @@
 RSpec.shared_context "stream" do
   let(:stream) do
     Class.new(StringIO) do
+      def inspect
+        string.inspect
+      end
+
       def logged_lines
         string.split("\n")
       end

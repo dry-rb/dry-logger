@@ -50,6 +50,15 @@ module Dry
         @options = {**options, progname: id}
       end
 
+      # Log an entry with UNKNOWN severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def unknown(message = nil, **payload)
+        log(:unknown, message, **payload)
+      end
+
       # Log an entry with DEBUG severity
       #
       # @see Dispatcher#log
@@ -84,6 +93,15 @@ module Dry
       # @return [true]
       def error(message = nil, **payload)
         log(:error, message, **payload)
+      end
+
+      # Log an entry with FATAL severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def fatal(message = nil, **payload)
+        log(:fatal, message, **payload)
       end
 
       BACKEND_METHODS.each do |name|
