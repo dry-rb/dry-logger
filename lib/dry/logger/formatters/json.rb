@@ -6,11 +6,12 @@ require "dry/logger/formatters/structured"
 module Dry
   module Logger
     module Formatters
-      # Dry::Logger JSON formatter.
-      # This formatter returns string in JSON format.
+      # JSON formatter.
+      #
+      # This formatter returns log entries in JSON format.
       #
       # @since 0.1.0
-      # @api private
+      # @api public
       class JSON < Structured
         # @since 0.1.0
         # @api private

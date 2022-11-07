@@ -17,6 +17,14 @@ module Dry
       # @api private
       attr_reader :id
 
+      # (EXPERIMENTAL) Shared payload context
+      #
+      # @example
+      #   logger.context[:component] = "test"
+      #
+      #   logger.info "Hello World"
+      #   # Hello World component=test
+      #
       # @since 1.0.0
       # @api public
       attr_reader :context
@@ -38,7 +46,7 @@ module Dry
       # @since 1.0.0
       #
       # @param [String, Symbol] id The dispatcher id, can be used as progname in log entries
-      # @param [Hash] **opts Options that can be used for both the backend and formatter
+      # @param [Hash] options Options that can be used for both the backend and formatter
       #
       # @return [Dispatcher]
       # @api public
@@ -137,7 +145,7 @@ module Dry
       #
       # @param [Symbol] severity The log severity name
       # @param [String,Symbol,Array] message Optional message object
-      # @param [Hash] **payload Optional log entry payload
+      # @param [Hash] payload Optional log entry payload
       #
       # @since 1.0.0
       # @return [true]
@@ -159,6 +167,17 @@ module Dry
         true
       end
 
+      # (EXPERIMENTAL) Tagged logging withing the provided block
+      #
+      # @example
+      #   logger.tagged("red") do
+      #     logger.info "Hello World"
+      #     # Hello World tag=red
+      #   end
+      #
+      #   logger.info "Hello Again"
+      #   # Hello Again
+      #
       # @since 1.0.0
       # @api public
       def tagged(tag)
@@ -169,6 +188,11 @@ module Dry
       end
 
       # Add a new backend to an existing dispatcher
+      #
+      # @example
+      #   logger.add_backend(template: "ERROR: %<message>s") { |b|
+      #     b.log_if = -> entry { entry.error? }
+      #   }
       #
       # @since 1.0.0
       # @return [Dispatcher]

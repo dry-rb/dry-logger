@@ -6,14 +6,12 @@ require "dry/logger/filter"
 module Dry
   module Logger
     module Formatters
-      # Dry::Logger default formatter.
-      # This formatter returns string in key=value format.
-      # Originaly copied from hanami/utils (see Hanami::Logger)
-      #
-      # @since 1.0.0
-      # @api private
+      # Default structured formatter which receives {Logger::Entry} from the backends.
       #
       # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html
+      #
+      # @since 1.0.0
+      # @api public
       class Structured < ::Logger::Formatter
         # @since 1.0.0
         # @api private

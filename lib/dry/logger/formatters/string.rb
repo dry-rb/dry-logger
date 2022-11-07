@@ -5,14 +5,12 @@ require "dry/logger/formatters/structured"
 module Dry
   module Logger
     module Formatters
-      # Dry::Logger default formatter.
-      # This formatter returns string in key=value format.
-      # Originaly copied from hanami/utils (see Hanami::Logger)
+      # Basic string formatter.
+      #
+      # This formatter returns log entries in key=value format.
       #
       # @since 1.0.0
-      # @api private
-      #
-      # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html
+      # @api public
       class String < Structured
         # @since 1.0.0
         # @api private
