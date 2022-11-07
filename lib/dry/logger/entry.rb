@@ -28,6 +28,10 @@ module Dry
 
       # @since 1.0.0
       # @api public
+      attr_reader :level
+
+      # @since 1.0.0
+      # @api public
       attr_reader :time
 
       # @since 1.0.0
@@ -44,6 +48,7 @@ module Dry
       def initialize(progname:, severity:, time: Time.now, message: nil, payload: EMPTY_PAYLOAD)
         @progname = progname
         @severity = severity.to_s.upcase # TODO: this doesn't feel right
+        @level = LEVELS.fetch(severity.to_s)
         @time = time
         @message = message
         @payload = build_payload(payload)
@@ -59,6 +64,36 @@ module Dry
       # @api public
       def [](name)
         payload[name]
+      end
+
+      # @since 1.0.0
+      # @api public
+      def debug?
+        level.equal?(DEBUG)
+      end
+
+      # @since 1.0.0
+      # @api public
+      def info?
+        level.equal?(INFO)
+      end
+
+      # @since 1.0.0
+      # @api public
+      def warn?
+        level.equal?(WARN)
+      end
+
+      # @since 1.0.0
+      # @api public
+      def error?
+        level.equal?(ERROR)
+      end
+
+      # @since 1.0.0
+      # @api public
+      def fatal?
+        level.equal?(FATAL)
       end
 
       # @since 1.0.0
