@@ -9,3 +9,4 @@ dispatchers that can log to different destinations.
 ### Added
 
 - Support for providing a string template for log entries via `template` option (via #7) (@solnic)
+- `:rack` string log formatter which inlines request info and displays params at the end (@solnic)
