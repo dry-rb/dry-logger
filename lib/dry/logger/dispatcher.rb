@@ -4,53 +4,36 @@ require "logger"
 require "pathname"
 
 require "dry/logger/constants"
-
-require "dry/logger/backends/io"
-require "dry/logger/backends/file"
+require "dry/logger/entry"
 
 module Dry
-  def self.Logger(id, **opts, &block)
-    Logger::Dispatcher.setup(id, **opts, &block)
-  end
-
   module Logger
-    LOG_METHODS = %i[debug error fatal info warn].freeze
-
-    BACKEND_METHODS = %i[close].freeze
-
-    def self.new(stream: $stdout, **opts)
-      backend =
-        case stream
-        when IO, StringIO then Backends::IO
-        when String, Pathname then Backends::File
-        else
-          raise ArgumentError, "unsupported stream type #{stream.class}"
-        end
-
-      formatter_opt = opts[:formatter]
-
-      formatter =
-        case formatter_opt
-        when Symbol then formatters.fetch(formatter_opt).new(**opts)
-        when Class then formatter_opt.new(**opts)
-        when NilClass then formatters[:string].new(**opts)
-        when ::Logger::Formatter then formatter_opt
-        else
-          raise ArgumentError, "unsupported formatter option #{formatter_opt.inspect}"
-        end
-
-      backend_opts = opts.select { |key, _| BACKEND_OPT_KEYS.include?(key) }
-
-      backend.new(stream: stream, **backend_opts, formatter: formatter)
-    end
-
+    # Logger dispatcher routes log entries to configured logging backends
+    #
+    # @since 1.0.0
+    # @api public
     class Dispatcher
+      # @since 1.0.0
+      # @api private
       attr_reader :id
 
+      # @since 1.0.0
+      # @api private
       attr_reader :backends
 
+      # @since 1.0.0
+      # @api private
       attr_reader :opts
 
+      # Set up a dispatcher
+      #
+      # @since 1.0.0
+      #
+      # @param [String, Symbol] id The dispatcher id, can be used as progname in log entries
+      # @param [Hash] **opts Options that can be used for both the backend and formatter
+      #
+      # @return [Dispatcher]
+      # @api public
       def self.setup(id, **opts)
         if opts.empty?
           new(id, backends: [Dry::Logger.new(**DEFAULT_OPTS)], **DEFAULT_OPTS)
@@ -59,6 +42,29 @@ module Dry
         end
       end
 
+      # @!method debug(message = nil, **payload)
+      #   Log an entry with DEBUG severity
+      #   @see Dispatcher#log
+      #   @api public
+      #   @return [true]
+      # @!method info(message = nil, **payload)
+      #   Log an entry with INFO severity
+      #   @see Dispatcher#log
+      #   @api public
+      #   @return [true]
+      #   @api public
+      # @!method warn(message = nil, **payload)
+      #   Log an entry with WARN severity
+      #   @see Dispatcher#log
+      #   @api public
+      #   @return [true]
+      #   @api public
+      # @!method error(message = nil, **payload)
+      #   Log an entry with ERROR severity
+      #   @see Dispatcher#log
+      #   @api public
+      #   @return [true]
+      #   @api public
       LOG_METHODS.each do |name|
         define_method(name) do |*args|
           log(name, *args)
@@ -71,30 +77,66 @@ module Dry
         end
       end
 
+      # @since 1.0.0
+      # @api private
       def initialize(id, backends:, **opts)
         @id = id
         @backends = backends
         @opts = opts
       end
 
+      # Return severity level
+      #
+      # @since 1.0.0
+      # @return [Integer]
+      # @api public
       def level
         LEVELS[opts[:level]]
       end
 
-      def call(meth, *args)
-        backends.each do |backend|
-          backend.public_send(meth, *args)
+      # Pass logging to all configured backends
+      #
+      # @param [Symbol] severity The log severity name
+      # @param [String,Symbol,Array] message Optional message object
+      # @param [Hash] **payload Optional log entry payload
+      #
+      # @since 1.0.0
+      # @return [true]
+      # @api public
+      def log(severity, message = nil, **payload)
+        case message
+        when String, Symbol, Array, Exception
+          call(
+            severity,
+            Entry.new(progname: id, severity: severity, message: message, payload: payload)
+          )
+        when Hash
+          call(severity, Entry.new(progname: id, severity: severity, payload: message))
         end
-      end
 
-      def log(meth, *args)
-        call(meth, *args)
         true
       end
 
+      # Add a new backend to an existing dispatcher
+      #
+      # @since 1.0.0
+      # @return [Dispatcher]
+      # @api public
       def add_backend(backend = nil, **opts)
         backends << (backend || Dry::Logger.new(**opts))
         self
+      end
+
+      # Pass logging to all configured backends
+      #
+      # @since 1.0.0
+      # @return [true]
+      # @api private
+      def call(meth, ...)
+        backends.each do |backend|
+          backend.public_send(meth, ...)
+        end
+        true
       end
     end
   end

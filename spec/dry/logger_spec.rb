@@ -175,12 +175,15 @@ RSpec.describe "Dry.Logger" do
         Dry.Logger(:test, formatter: :json).info("foo")
       end
 
-      expect(JSON.parse(output)).to eql(
+      expected_json = {
         "progname" => "test",
         "severity" => "INFO",
         "time" => "2017-01-15T15:00:23Z",
         "message" => "foo"
-      )
+      }
+
+      expect(output).to eql("#{JSON.dump(expected_json)}\n")
+      expect(JSON.parse(output)).to eql(expected_json)
     end
 
     it "has JSON format for string messages" do
@@ -279,37 +282,48 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
-  describe "with filters" do
+  describe "with filters and params" do
     let(:filters) { %w[password password_confirmation credit_card user.login] }
 
     let(:params) do
-      Hash[
-        params: Hash[
+      {
+        params: {
           "password" => "password",
           "password_confirmation" => "password",
-          "credit_card" => Hash[
+          "credit_card" => {
             "number" => "4545 4545 4545 4545",
             "name" => "John Citizen"
-          ],
-          "user" => Hash[
+          },
+          "user" => {
             "login" => "John",
             "name" => "John"
-          ]
-        ]
-      ]
+          }
+        }
+      }
     end
 
     subject(:logger) do
       Dry.Logger(
         :test,
-        formatter: :string,
+        formatter: :params,
         template: "[%<progname>s] [%<severity>s] [%<time>s] %<message>s",
         filters: filters
       )
     end
 
     it "filters values for keys in the filters array" do
-      expected = %s({"password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]", "credit_card"=>{"number"=>"[FILTERED]", "name"=>"[FILTERED]"}, "user"=>{"login"=>"[FILTERED]", "name"=>"John"}})
+      expected = {
+        "password" => "[FILTERED]",
+        "password_confirmation" => "[FILTERED]",
+        "credit_card" => {
+          "number" => "[FILTERED]",
+          "name" => "[FILTERED]"
+        },
+        "user" => {
+          "login" => "[FILTERED]",
+          "name" => "John"
+        }
+      }
 
       output = with_captured_stdout do
         logger.info(params)

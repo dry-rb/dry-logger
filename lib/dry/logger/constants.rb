@@ -4,6 +4,10 @@ require "logger"
 
 module Dry
   module Logger
+    LOG_METHODS = %i[debug error fatal info warn].freeze
+
+    BACKEND_METHODS = %i[close].freeze
+
     DEBUG = ::Logger::DEBUG
     INFO = ::Logger::INFO
     WARN = ::Logger::WARN
