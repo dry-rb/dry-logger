@@ -1,21 +1,14 @@
 ---
-- version: unreleased
+- version: 1.0.0.rc1
   summary: |
     This is a port of the original Hanami logger from hanami-utils extended with support for logging
     dispatchers that can log to different destinations.
-  date: 
-  fixed: 
-  added: &1
+  date: 2022-11-07
+  fixed:
+  added:
   - 'Support for providing a string template for log entries via `template` option
     (via #7) (@solnic)'
   - "`:rack` string log formatter which inlines request info and displays params at
     the end (@solnic)"
   - 'Conditional log dispatch via `#log_if` backend''s predicate (via #9) (@solnic)'
   - 'Add support for shared context and tagged log entries (via #10) (@solnic)'
-  changed: 
-- version: unreleased
-  date: 
-  summary: |
-    This is a port of the original Hanami logger from hanami-utils extended with support for logging
-    dispatchers that can log to different destinations.
-  added: *1
