@@ -11,6 +11,7 @@ dispatchers that can log to different destinations.
 - Support for providing a string template for log entries via `template` option (via #7) (@solnic)
 - `:rack` string log formatter which inlines request info and displays params at the end (@solnic)
 - Conditional log dispatch via `#log_if` backend's predicate (via #9) (@solnic)
+- Add support for shared context and tagged log entries (via #10) (@solnic)
 
 
 [Compare vunreleased...master](https://github.com/dry-rb/dry-logger/compare/vunreleased...master)
@@ -26,3 +27,4 @@ dispatchers that can log to different destinations.
 - Support for providing a string template for log entries via `template` option (via #7) (@solnic)
 - `:rack` string log formatter which inlines request info and displays params at the end (@solnic)
 - Conditional log dispatch via `#log_if` backend's predicate (via #9) (@solnic)
+- Add support for shared context and tagged log entries (via #10) (@solnic)
