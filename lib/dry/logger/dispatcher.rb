@@ -34,17 +34,15 @@ module Dry
       #
       # @return [Dispatcher]
       # @api public
-      def self.setup(id, **opts)
-        if opts.empty?
-          new(id, backends: [Dry::Logger.new(**DEFAULT_OPTS)], **DEFAULT_OPTS)
-        else
-          new(id, backends: [Dry::Logger.new(progname: id, **opts)], **DEFAULT_OPTS, **opts)
-        end
+      def self.setup(id, **options)
+        dispatcher = new(id, **DEFAULT_OPTS, **options)
+        dispatcher.add_backend if dispatcher.backends.empty?
+        dispatcher
       end
 
       # @since 1.0.0
       # @api private
-      def initialize(id, backends:, **options)
+      def initialize(id, backends: [], **options)
         @id = id
         @backends = backends
         @options = {**options, progname: id}
