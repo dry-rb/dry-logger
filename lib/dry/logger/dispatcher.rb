@@ -23,7 +23,7 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      attr_reader :opts
+      attr_reader :options
 
       # Set up a dispatcher
       #
@@ -40,6 +40,14 @@ module Dry
         else
           new(id, backends: [Dry::Logger.new(progname: id, **opts)], **DEFAULT_OPTS, **opts)
         end
+      end
+
+      # @since 1.0.0
+      # @api private
+      def initialize(id, backends:, **options)
+        @id = id
+        @backends = backends
+        @options = {**options, progname: id}
       end
 
       # Log an entry with DEBUG severity
@@ -84,21 +92,13 @@ module Dry
         end
       end
 
-      # @since 1.0.0
-      # @api private
-      def initialize(id, backends:, **opts)
-        @id = id
-        @backends = backends
-        @opts = opts
-      end
-
       # Return severity level
       #
       # @since 1.0.0
       # @return [Integer]
       # @api public
       def level
-        LEVELS[opts[:level]]
+        LEVELS[options[:level]]
       end
 
       # Pass logging to all configured backends
@@ -114,9 +114,9 @@ module Dry
         case message
         when Hash then log(severity, nil, **message)
         else
-          call(
-            severity, Entry.new(progname: id, severity: severity, message: message, payload: payload)
-          )
+          entry = Entry.new(progname: id, severity: severity, message: message, payload: payload)
+
+          each_backend { |backend| backend.__send__(severity, entry) if backend.log?(entry) }
         end
       end
 
@@ -125,9 +125,17 @@ module Dry
       # @since 1.0.0
       # @return [Dispatcher]
       # @api public
-      def add_backend(backend = nil, **opts)
-        backends << (backend || Dry::Logger.new(**opts))
+      def add_backend(instance = nil, **backend_options)
+        backend = instance || Dry::Logger.new(**options, **backend_options)
+        yield(backend) if block_given?
+        backends << backend
         self
+      end
+
+      # @since 1.0.0
+      # @api private
+      def each_backend(*_args, &block)
+        backends.each(&block)
       end
 
       # Pass logging to all configured backends
@@ -136,9 +144,7 @@ module Dry
       # @return [true]
       # @api private
       def call(meth, ...)
-        backends.each do |backend|
-          backend.public_send(meth, ...)
-        end
+        each_backend { |backend| backend.public_send(meth, ...) }
         true
       end
     end

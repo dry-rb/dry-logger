@@ -366,7 +366,7 @@ RSpec.describe "Dry.Logger" do
         [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
         2017-01-15 16:00:23 +0100 #{expected}
       LOG
-      )
+                          )
     end
   end
 

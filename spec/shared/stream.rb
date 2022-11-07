@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_context "stream" do
   let(:stream) do
     Class.new(StringIO) do
