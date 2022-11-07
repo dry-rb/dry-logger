@@ -282,30 +282,39 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
-  describe "with filters and params" do
+  describe "with filters and rack" do
     let(:filters) { %w[password password_confirmation credit_card user.login] }
 
     let(:params) do
       {
-        params: {
-          "password" => "password",
-          "password_confirmation" => "password",
-          "credit_card" => {
-            "number" => "4545 4545 4545 4545",
-            "name" => "John Citizen"
-          },
-          "user" => {
-            "login" => "John",
-            "name" => "John"
-          }
+        "password" => "password",
+        "password_confirmation" => "password",
+        "credit_card" => {
+          "number" => "4545 4545 4545 4545",
+          "name" => "John Citizen"
+        },
+        "user" => {
+          "login" => "John",
+          "name" => "John"
         }
       }
+    end
+
+    let(:payload) do
+      {verb: "POST",
+       status: 200,
+       elapsed: "2ms",
+       ip: "127.0.0.1",
+       path: "/api/users",
+       length: 312,
+       params: params,
+       time: Time.now}
     end
 
     subject(:logger) do
       Dry.Logger(
         :test,
-        formatter: :params,
+        formatter: :rack,
         template: "[%<progname>s] [%<severity>s] [%<time>s] %<message>s",
         filters: filters
       )
@@ -326,10 +335,14 @@ RSpec.describe "Dry.Logger" do
       }
 
       output = with_captured_stdout do
-        logger.info(params)
+        logger.info(payload)
       end
 
-      expect(output).to eq("[test] [INFO] [2017-01-15 16:00:23 +0100] #{expected}\n")
+      expect(output).to eq(<<~LOG
+        [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
+        2017-01-15 16:00:23 +0100 #{expected}
+      LOG
+      )
     end
   end
 

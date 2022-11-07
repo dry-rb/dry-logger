@@ -11,15 +11,11 @@ module Dry
       # @api private
       #
       # @see String
-      class Params < String
+      class Rack < String
         # @since 1.0.0
         # @api private
         def format_entry(entry)
-          if entry.key?(:params)
-            entry[:params]
-          else
-            super
-          end
+          [*entry.payload.except(:params).values, entry[:params]].compact.join(SEPARATOR)
         end
       end
     end
