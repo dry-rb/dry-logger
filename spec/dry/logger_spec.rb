@@ -209,6 +209,20 @@ RSpec.describe "Dry.Logger" do
       )
     end
 
+    it "has JSON format for string messages with payloads" do
+      output = with_captured_stdout do
+        Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info("foo", test: true)
+      end
+
+      expect(JSON.parse(output)).to eql(
+        "progname" => "test",
+        "severity" => "INFO",
+        "time" => "2017-01-15T15:00:23Z",
+        "message" => "foo",
+        "test" => true
+      )
+    end
+
     it "has JSON format for error messages" do
       output = with_captured_stdout do
         Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
