@@ -18,12 +18,20 @@ module Dry
       attr_reader :id
 
       # @since 1.0.0
+      # @api public
+      attr_reader :context
+
+      # @since 1.0.0
       # @api private
       attr_reader :backends
 
       # @since 1.0.0
       # @api private
       attr_reader :options
+
+      # @since 1.0.0
+      # @api private
+      attr_reader :mutex
 
       # Set up a dispatcher
       #
@@ -42,10 +50,18 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(id, backends: [], **options)
+      def self.default_context
+        Thread.current[:__dry_logger__] ||= {}
+      end
+
+      # @since 1.0.0
+      # @api private
+      def initialize(id, backends: [], context: self.class.default_context, **options)
         @id = id
         @backends = backends
         @options = {**options, progname: id}
+        @mutex = Mutex.new
+        @context = context
       end
 
       # Log an entry with UNKNOWN severity
@@ -130,12 +146,26 @@ module Dry
         case message
         when Hash then log(severity, nil, **message)
         else
-          entry = Entry.new(progname: id, severity: severity, message: message, payload: payload)
+          entry = Entry.new(
+            progname: id,
+            severity: severity,
+            message: message,
+            payload: {**context, **payload}
+          )
 
           each_backend { |backend| backend.__send__(severity, entry) if backend.log?(entry) }
         end
 
         true
+      end
+
+      # @since 1.0.0
+      # @api public
+      def tagged(tag)
+        context[:tag] = tag
+        yield
+      ensure
+        context.delete(:tag)
       end
 
       # Add a new backend to an existing dispatcher
@@ -153,7 +183,9 @@ module Dry
       # @since 1.0.0
       # @api private
       def each_backend(*_args, &block)
-        backends.each(&block)
+        mutex.synchronize do
+          backends.each(&block)
+        end
       end
 
       # Pass logging to all configured backends
