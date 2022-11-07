@@ -54,9 +54,12 @@ module Dry
         def format_entry(entry)
           if entry.exception?
             format_exception(entry)
-          # TODO: there's no scenario for messages AND payload in specs yet
           elsif entry.message
-            entry.message
+            if entry.payload.empty?
+              entry.message
+            else
+              "#{entry.message}#{SEPARATOR}#{format_payload(entry)}"
+            end
           else
             format_payload(entry)
           end

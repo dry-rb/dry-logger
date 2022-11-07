@@ -42,33 +42,40 @@ module Dry
         end
       end
 
-      # @!method debug(message = nil, **payload)
-      #   Log an entry with DEBUG severity
-      #   @see Dispatcher#log
-      #   @api public
-      #   @return [true]
-      # @!method info(message = nil, **payload)
-      #   Log an entry with INFO severity
-      #   @see Dispatcher#log
-      #   @api public
-      #   @return [true]
-      #   @api public
-      # @!method warn(message = nil, **payload)
-      #   Log an entry with WARN severity
-      #   @see Dispatcher#log
-      #   @api public
-      #   @return [true]
-      #   @api public
-      # @!method error(message = nil, **payload)
-      #   Log an entry with ERROR severity
-      #   @see Dispatcher#log
-      #   @api public
-      #   @return [true]
-      #   @api public
-      LOG_METHODS.each do |name|
-        define_method(name) do |*args|
-          log(name, *args)
-        end
+      # Log an entry with DEBUG severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def debug(message = nil, **payload)
+        log(:debug, message, **payload)
+      end
+
+      # Log an entry with INFO severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def info(message = nil, **payload)
+        log(:info, message, **payload)
+      end
+
+      # Log an entry with WARN severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def warn(message = nil, **payload)
+        log(:warn, message, **payload)
+      end
+
+      # Log an entry with ERROR severity
+      #
+      # @see Dispatcher#log
+      # @api public
+      # @return [true]
+      def error(message = nil, **payload)
+        log(:error, message, **payload)
       end
 
       BACKEND_METHODS.each do |name|
@@ -105,16 +112,12 @@ module Dry
       # @api public
       def log(severity, message = nil, **payload)
         case message
-        when String, Symbol, Array, Exception
+        when Hash then log(severity, nil, **message)
+        else
           call(
-            severity,
-            Entry.new(progname: id, severity: severity, message: message, payload: payload)
+            severity, Entry.new(progname: id, severity: severity, message: message, payload: payload)
           )
-        when Hash
-          call(severity, Entry.new(progname: id, severity: severity, payload: message))
         end
-
-        true
       end
 
       # Add a new backend to an existing dispatcher

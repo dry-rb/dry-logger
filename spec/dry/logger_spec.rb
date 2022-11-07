@@ -14,7 +14,7 @@ RSpec.describe "Dry.Logger" do
   context "default" do
     subject(:logger) { Dry.Logger(:test) }
 
-    it "uses $stdout by default" do
+    it "logs to $stdout by default using a plain text message" do
       message = "hello, world"
 
       output = with_captured_stdout do
@@ -22,6 +22,16 @@ RSpec.describe "Dry.Logger" do
       end
 
       expect(output).to match(message)
+    end
+
+    it "logs to $stdout by default using a plain text message and payload" do
+      message = "hello, world"
+
+      output = with_captured_stdout do
+        logger.info(message, test: true)
+      end
+
+      expect(output).to match("#{message} test=true")
     end
   end
 
