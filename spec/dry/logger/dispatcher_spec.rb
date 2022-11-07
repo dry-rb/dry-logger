@@ -71,4 +71,32 @@ RSpec.describe Dry::Logger::Dispatcher do
       expect(backend_two).to have_received(:close)
     end
   end
+
+  describe "#tagged" do
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s", context: {}) }
+
+    it "sets tags in log entries" do
+      logger.tagged(:metrics) do
+        logger.info("test 1")
+        logger.info("test 2")
+      end
+
+      expect(stream).to include("test 1 tag=:metrics")
+      expect(stream).to include("test 2 tag=:metrics")
+    end
+  end
+
+  describe "#context" do
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s", context: {}) }
+
+    it "allows set pre-defined payload data" do
+      logger.context[:component] = "test"
+
+      logger.info("test 1")
+      logger.info("test 2")
+
+      expect(stream).to include('test 1 component="test"')
+      expect(stream).to include('test 2 component="test"')
+    end
+  end
 end
