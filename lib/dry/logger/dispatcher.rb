@@ -118,6 +118,8 @@ module Dry
 
           each_backend { |backend| backend.__send__(severity, entry) if backend.log?(entry) }
         end
+
+        true
       end
 
       # Add a new backend to an existing dispatcher

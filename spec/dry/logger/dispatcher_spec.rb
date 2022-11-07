@@ -32,6 +32,14 @@ RSpec.describe Dry::Logger::Dispatcher do
     end
   end
 
+  describe "#log" do
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
+
+    it "logs and returns true" do
+      expect(logger.info("Hello World")).to be(true)
+    end
+  end
+
   describe "#close" do
     subject(:logger) { Dry.Logger(:test) }
 
