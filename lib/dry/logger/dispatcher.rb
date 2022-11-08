@@ -161,7 +161,9 @@ module Dry
             payload: {**context, **payload}
           )
 
-          each_backend { |backend| backend.__send__(severity, entry) if backend.log?(entry) }
+          each_backend do |backend|
+            backend.__send__(severity, entry) if !backend.respond_to?(:log?) || backend.log?(entry)
+          end
         end
 
         true

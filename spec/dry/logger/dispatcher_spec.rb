@@ -44,6 +44,14 @@ RSpec.describe Dry::Logger::Dispatcher do
 
       expect(stream).to include("second: world")
     end
+
+    it "works with a stdlib logger" do
+      logger.add_backend(Logger.new(stream))
+
+      logger.info "Hello World"
+
+      expect(stream).to include("Hello World")
+    end
   end
 
   describe "#log" do
