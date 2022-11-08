@@ -128,7 +128,7 @@ module Dry
 
       BACKEND_METHODS.each do |name|
         define_method(name) do
-          call(name)
+          forward(name)
         end
       end
 
@@ -217,7 +217,7 @@ module Dry
       # @since 1.0.0
       # @return [true]
       # @api private
-      def call(meth, ...)
+      def forward(meth, ...)
         each_backend { |backend| backend.public_send(meth, ...) }
         true
       end
