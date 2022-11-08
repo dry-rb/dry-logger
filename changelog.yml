@@ -1,4 +1,13 @@
 ---
+- version: 1.0.0.rc2
+  date: 2022-11-08
+  added:
+    - "Support for regular logger backends that don't support `log?` predicate (@solnic)"
+  changed:
+    - "Renamed `Dispatcher#call=>forward` because some libraries use `#call` in a different way (@solnic)"
+  fixed:
+    - "Added missing require of 'stringio' (@solnic)"
+
 - version: 1.0.0.rc1
   summary: |
     This is a port of the original Hanami logger from hanami-utils extended with support for logging
