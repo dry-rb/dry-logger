@@ -287,22 +287,21 @@ RSpec.describe "Dry.Logger" do
     end
 
     it "has key=value format for error messages" do
-      exc = nil
-
-      begin
-        raise StandardError, "foo"
-      rescue StandardError => e
-        exc = e
-      end
+      backtrace = ["file-1.rb:312", "file-2.rb:12", "file-3.rb:115"]
+      exception = StandardError.new("foo").tap { |e| e.set_backtrace(backtrace) }
 
       output = with_captured_stdout do
-        logger.error(exc)
+        logger.error(exception)
       end
 
-      expectation = "[test] [ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo\n"
-      backtrace = exc.backtrace.map { |line| "from #{line}\n" }.join
+      expected = <<~STR
+        [test] [ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo
+        from file-1.rb:312
+        from file-2.rb:12
+        from file-3.rb:115
+        STR
 
-      expect(output).to eq(expectation + backtrace)
+      expect(output).to eql(expected)
     end
   end
 
