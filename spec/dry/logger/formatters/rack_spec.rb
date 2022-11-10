@@ -92,5 +92,25 @@ RSpec.describe Dry::Logger::Formatters::Rack do
 
       expect(output).to eql(expected)
     end
+
+    it "logs exception details with a backtrace and additional payload" do
+      backtrace = ["file-1.rb:312", "file-2.rb:12", "file-3.rb:115"]
+      exception = StandardError.new("foo").tap { |e| e.set_backtrace(backtrace) }
+
+      payload = {verb: "POST", status: 500, elapsed: "2ms", ip: "127.0.0.1", path: "/api/users"}
+
+      output = with_captured_stdout do
+        logger.error(exception, **payload)
+      end
+
+      expected = <<~STR
+        [test] [ERROR] [2017-01-15 16:00:23 +0100] POST 500 2ms 127.0.0.1 /api/users StandardError: foo
+        from file-1.rb:312
+        from file-2.rb:12
+        from file-3.rb:115
+        STR
+
+      expect(output).to eql(expected)
+    end
   end
 end

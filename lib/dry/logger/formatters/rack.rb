@@ -16,10 +16,19 @@ module Dry
         # @api private
         def format_entry(entry)
           if entry.exception?
-            super
+            [
+              format_payload(entry, Entry::EXCEPTION_PAYLOAD_KEYS),
+              format_exception(entry)
+            ].reject(&:empty?).join(SEPARATOR)
           else
-            [*entry.payload.except(:params).values, entry[:params]].compact.join(SEPARATOR)
+            format_payload(entry)
           end
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_payload(entry, excluded_keys = [])
+          [*entry.payload.except(:params, *excluded_keys).values, entry[:params]].compact.join(SEPARATOR)
         end
       end
     end

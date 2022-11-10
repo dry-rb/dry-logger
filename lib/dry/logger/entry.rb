@@ -19,6 +19,10 @@ module Dry
       EMPTY_BACKTRACE = [].freeze
 
       # @since 1.0.0
+      # @api private
+      EXCEPTION_PAYLOAD_KEYS = %i[error message backtrace]
+
+      # @since 1.0.0
       # @api public
       attr_reader :progname
 
