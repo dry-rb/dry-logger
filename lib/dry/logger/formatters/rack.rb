@@ -15,7 +15,11 @@ module Dry
         # @since 1.0.0
         # @api private
         def format_entry(entry)
-          [*entry.payload.except(:params).values, entry[:params]].compact.join(SEPARATOR)
+          if entry.exception?
+            super
+          else
+            [*entry.payload.except(:params).values, entry[:params]].compact.join(SEPARATOR)
+          end
         end
       end
     end
