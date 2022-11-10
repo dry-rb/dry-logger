@@ -28,7 +28,10 @@ module Dry
         # @since 1.0.0
         # @api private
         def format_payload(entry, excluded_keys = [])
-          [*entry.payload.except(:params, *excluded_keys).values, entry[:params]].compact.join(SEPARATOR)
+          [
+            *entry.payload.except(:params, *excluded_keys).values,
+            entry[:params]
+          ].compact.join(SEPARATOR)
         end
       end
     end
