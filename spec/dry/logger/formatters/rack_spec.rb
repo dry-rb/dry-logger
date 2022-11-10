@@ -14,7 +14,9 @@ RSpec.describe Dry::Logger::Formatters::Rack do
     allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
   end
 
-  let(:filters) { %w[password password_confirmation credit_card user.login] }
+  let(:filters) do
+    []
+  end
 
   let(:params) do
     {
@@ -42,27 +44,33 @@ RSpec.describe Dry::Logger::Formatters::Rack do
      time: Time.now}
   end
 
-  it "filters values for keys in the filters array" do
-    expected = {
-      "password" => "[FILTERED]",
-      "password_confirmation" => "[FILTERED]",
-      "credit_card" => {
-        "number" => "[FILTERED]",
-        "name" => "[FILTERED]"
-      },
-      "user" => {
-        "login" => "[FILTERED]",
-        "name" => "John"
-      }
-    }
-
-    output = with_captured_stdout do
-      logger.info(payload)
+  context "with filters" do
+    let(:filters) do
+      %w[password password_confirmation credit_card user.login]
     end
 
-    expect(output).to eq(<<~LOG)
-      [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
-      2017-01-15 16:00:23 +0100 #{expected}
-    LOG
+    it "filters values for keys in the filters array" do
+      expected = {
+        "password" => "[FILTERED]",
+        "password_confirmation" => "[FILTERED]",
+        "credit_card" => {
+          "number" => "[FILTERED]",
+          "name" => "[FILTERED]"
+        },
+        "user" => {
+          "login" => "[FILTERED]",
+          "name" => "John"
+        }
+      }
+
+      output = with_captured_stdout do
+        logger.info(payload)
+      end
+
+      expect(output).to eq(<<~LOG)
+        [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
+        2017-01-15 16:00:23 +0100 #{expected}
+      LOG
+    end
   end
 end
