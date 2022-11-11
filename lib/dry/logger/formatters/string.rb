@@ -53,7 +53,7 @@ module Dry
             [
               template % format_payload_values(entry),
               format_payload(entry.payload.except(*template.tokens))
-            ].reject(&:empty?).join(SEPARATOR)
+            ].reject(&:empty?).map(&:strip).join(SEPARATOR)
           end
         end
 
@@ -76,17 +76,26 @@ module Dry
         # @since 1.0.0
         # @api private
         def format_exception(entry)
-          hash = entry.payload
-          message = hash.values_at(:error, :message).compact.join(EXCEPTION_SEPARATOR)
-          backtrace = hash[:backtrace].map { |line, idx| "#{TAB}#{line}" }.join(NEW_LINE)
+          log_line = [
+            format_payload(entry.payload.slice(:exception, :message)),
+            format_payload(entry.payload.except(*Entry::EXCEPTION_PAYLOAD_KEYS))
+          ].reject(&:empty?).join(SEPARATOR)
 
-          "#{message}#{NEW_LINE}#{backtrace}"
+          trace_line = format_backtrace(entry)
+
+          "#{log_line}#{NEW_LINE}#{trace_line}"
         end
 
         # @since 1.0.0
         # @api private
         def format_payload(entry)
-          entry.map { |key, value| "#{key}=#{value.inspect}" }.join(HASH_SEPARATOR)
+          entry.map { |key, value| "#{key}=#{value.inspect}" }.join(SEPARATOR)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_backtrace(entry)
+          entry[:backtrace].map { |line| "#{TAB}#{line}" }.join(NEW_LINE)
         end
 
         # @since 1.0.0
