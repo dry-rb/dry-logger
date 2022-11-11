@@ -21,6 +21,10 @@ module Dry
 
         # @since 1.0.0
         # @api private
+        TAB = SEPARATOR * 2
+
+        # @since 1.0.0
+        # @api private
         HASH_SEPARATOR = ","
 
         # @since 1.0.0
@@ -74,7 +78,9 @@ module Dry
         def format_exception(entry)
           hash = entry.payload
           message = hash.values_at(:error, :message).compact.join(EXCEPTION_SEPARATOR)
-          "#{message}#{NEW_LINE}#{hash[:backtrace].map { |line| "from #{line}" }.join(NEW_LINE)}"
+          backtrace = hash[:backtrace].map { |line, idx| "#{TAB}#{line}" }.join(NEW_LINE)
+
+          "#{message}#{NEW_LINE}#{backtrace}"
         end
 
         # @since 1.0.0

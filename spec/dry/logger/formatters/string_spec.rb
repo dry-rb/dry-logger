@@ -40,9 +40,9 @@ RSpec.describe Dry::Logger::Formatters::String do
 
       expected = <<~STR
         [test] [ERROR] [2017-01-15 16:00:23 +0100] StandardError: foo
-        from file-1.rb:312
-        from file-2.rb:12
-        from file-3.rb:115
+          file-1.rb:312
+          file-2.rb:12
+          file-3.rb:115
       STR
 
       expect(output).to eql(expected)
