@@ -6,6 +6,7 @@
 ### Added
 
 - Support arbitrary logging backends through proxy (via #12) (@solnic)
+- Support for conditional logging when using arbitrary logging backends (via #13) (@solnic)
 
 
 [Compare v1.0.0.rc2...master](https://github.com/dry-rb/dry-logger/compare/v1.0.0.rc2...master)
