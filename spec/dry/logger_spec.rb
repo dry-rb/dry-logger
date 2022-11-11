@@ -33,6 +33,24 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
+  context "using external logger as backend" do
+    include_context "stream"
+
+    subject(:logger) { Dry.Logger(:test).add_backend(backend) }
+
+    context "with an stdlib logger" do
+      let(:backend) { Logger.new(stream) }
+
+      it "logs info messages" do
+        backend.formatter = -> (_, _, _, msg) { msg }
+
+        logger.info(message = "hello, world")
+
+        expect(stream).to include(message)
+      end
+    end
+  end
+
   context "file" do
     subject(:logger) { Dry.Logger(:test, stream: stream) }
 
