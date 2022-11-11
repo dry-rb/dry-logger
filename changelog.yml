@@ -5,6 +5,8 @@
   fixed: 
   added:
   - 'Support arbitrary logging backends through proxy (via #12) (@solnic)'
+  - 'Support for conditional logging when using arbitrary logging backends (via #13)
+    (@solnic)'
   changed: 
 - version: 1.0.0.rc2
   date: 2022-11-08
