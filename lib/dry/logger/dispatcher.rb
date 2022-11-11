@@ -4,6 +4,7 @@ require "logger"
 require "pathname"
 
 require "dry/logger/constants"
+require "dry/logger/backends/proxy"
 require "dry/logger/entry"
 
 module Dry
@@ -162,7 +163,7 @@ module Dry
           )
 
           each_backend do |backend|
-            backend.__send__(severity, entry) if !backend.respond_to?(:log?) || backend.log?(entry)
+            backend.__send__(severity, entry) if backend.log?(entry)
           end
         end
 
@@ -200,8 +201,14 @@ module Dry
       # @return [Dispatcher]
       # @api public
       def add_backend(instance = nil, **backend_options)
-        backend = instance || Dry::Logger.new(**options, **backend_options)
+        backend =
+          case (instance ||= Dry::Logger.new(**options, **backend_options))
+          when Backends::Stream then instance
+          else Backends::Proxy.new(instance)
+          end
+
         yield(backend) if block_given?
+
         backends << backend
         self
       end
