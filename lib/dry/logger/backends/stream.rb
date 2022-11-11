@@ -3,11 +3,14 @@
 require "logger"
 
 require "dry/logger/constants"
+require "dry/logger/backends/core"
 
 module Dry
   module Logger
     module Backends
       class Stream < ::Logger
+        include Core
+
         # @since 0.1.0
         # @api private
         attr_reader :stream
@@ -15,10 +18,6 @@ module Dry
         # @since 0.1.0
         # @api private
         attr_reader :level
-
-        # @since 0.1.0
-        # @api public
-        attr_accessor :log_if
 
         # @since 0.1.0
         # @api private

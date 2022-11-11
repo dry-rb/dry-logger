@@ -1,27 +1,14 @@
 # frozen_string_literal: true
 
-require "delegate"
-
 require "dry/logger/constants"
-require "dry/logger/backends/core"
 
 module Dry
   module Logger
     module Backends
-      # Logger proxy is used for regular loggers that don't work with log entries
-      #
-      # @since 1.0.0
-      # @api private
-      class Proxy < SimpleDelegator
-        include Core
-
+      module Core
         # @since 0.1.0
         # @api public
         attr_accessor :log_if
-
-        LOG_METHODS.each do |method|
-          define_method(method) { |entry| __getobj__.public_send(method, entry.message) }
-        end
 
         # @since 1.0.0
         # @api private
