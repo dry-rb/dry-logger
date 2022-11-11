@@ -11,14 +11,22 @@ module Dry
       # @since 1.0.0
       # @api private
       class Proxy < SimpleDelegator
+        # @since 0.1.0
+        # @api public
+        attr_accessor :log_if
+
         LOG_METHODS.each do |method|
           define_method(method) { |entry| __getobj__.public_send(method, entry.message) }
         end
 
         # @since 1.0.0
         # @api private
-        def log?(_entry)
-          true
+        def log?(entry)
+          if log_if
+            log_if.call(entry)
+          else
+            true
+          end
         end
       end
     end

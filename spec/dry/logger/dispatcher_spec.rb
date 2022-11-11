@@ -52,6 +52,20 @@ RSpec.describe Dry::Logger::Dispatcher do
 
       expect(stream).to include("Hello World")
     end
+
+    it "works with a any compatible object and supports conditional logging" do
+      other_logger = Logger.new(stream)
+
+      logger.add_backend(other_logger) { |backend| backend.log_if = :error?.to_proc }
+
+      other_logger.formatter = -> (_, _, _, msg) { "from other: #{msg}" }
+
+      logger.info "Hello World"
+      logger.error "Oops"
+
+      expect(stream).to_not include("from other: Hello World")
+      expect(stream).to include("Hello World")
+    end
   end
 
   describe "#log" do
