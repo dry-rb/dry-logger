@@ -43,7 +43,7 @@ RSpec.describe Dry::Logger::Formatters::String do
         from file-1.rb:312
         from file-2.rb:12
         from file-3.rb:115
-        STR
+      STR
 
       expect(output).to eql(expected)
     end
