@@ -16,4 +16,8 @@ RSpec.shared_context "stream" do
       end
     end.new
   end
+
+  let(:output) do
+    stream.string
+  end
 end
