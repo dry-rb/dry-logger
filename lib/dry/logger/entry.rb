@@ -19,6 +19,10 @@ module Dry
       EMPTY_BACKTRACE = [].freeze
 
       # @since 1.0.0
+      # @api private
+      EXCEPTION_PAYLOAD_KEYS = %i[exception message backtrace].freeze
+
+      # @since 1.0.0
       # @api public
       attr_reader :progname
 
@@ -146,9 +150,9 @@ module Dry
       # @api private
       def build_payload(payload)
         if exception?
-          {message: exception.message,
+          {exception: exception.class,
+           message: exception.message,
            backtrace: exception.backtrace || EMPTY_BACKTRACE,
-           error: exception.class,
            **payload}
         else
           payload

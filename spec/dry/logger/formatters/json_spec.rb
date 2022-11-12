@@ -59,7 +59,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
       "time" => "2017-01-15T15:00:23Z",
       "message" => "foo",
       "backtrace" => [],
-      "error" => "Exception"
+      "exception" => "Exception"
     )
   end
 

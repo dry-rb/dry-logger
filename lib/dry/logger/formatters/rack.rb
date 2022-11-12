@@ -12,10 +12,12 @@ module Dry
       #
       # @see String
       class Rack < String
+        # @see String#initialize
         # @since 1.0.0
         # @api private
-        def format_entry(entry)
-          [*entry.payload.except(:params).values, entry[:params]].compact.join(SEPARATOR)
+        def initialize(**options)
+          super
+          @template = Template[Logger.templates[:rack]]
         end
       end
     end
