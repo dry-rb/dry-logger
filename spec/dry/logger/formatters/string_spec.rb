@@ -39,10 +39,8 @@ RSpec.describe Dry::Logger::Formatters::String do
       logger.error(exception)
 
       expected = <<~STR
-        [test] [ERROR] [2017-01-15 16:00:23 +0100] exception=StandardError message="foo"
-          file-1.rb:312
-          file-2.rb:12
-          file-3.rb:115
+        [test] [ERROR] [2017-01-15 16:00:23 +0100] foo exception=StandardError \
+        backtrace=#{backtrace.inspect}
       STR
 
       expect(output).to eql(expected)

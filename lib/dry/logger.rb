@@ -6,6 +6,7 @@ require "dry/logger/constants"
 require "dry/logger/dispatcher"
 
 require "dry/logger/formatters/string"
+require "dry/logger/formatters/exception"
 require "dry/logger/formatters/rack"
 require "dry/logger/formatters/json"
 
@@ -148,10 +149,16 @@ module Dry
     end
 
     register_formatter(:string, Formatters::String)
+    register_formatter(:exception, Formatters::Exception)
     register_formatter(:rack, Formatters::Rack)
     register_formatter(:json, Formatters::JSON)
 
     register_template(:default, "%<message>s")
+
+    register_template(:exception, <<~STR)
+      [%<progname>s] [%<severity>s] [%<time>s] exception=%<exception>s message=%<message>s
+      %<backtrace>s
+    STR
 
     register_template(:rack, <<~STR)
       [%<progname>s] [%<severity>s] [%<time>s] \

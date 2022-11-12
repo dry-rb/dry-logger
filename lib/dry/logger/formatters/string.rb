@@ -47,7 +47,7 @@ module Dry
         # @since 1.0.0
         # @api private
         def format(entry)
-          if template.include?(:message)
+          if template.include?(:message) && !entry.exception?
             "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
           else
             [
@@ -60,9 +60,7 @@ module Dry
         # @since 1.0.0
         # @api private
         def format_entry(entry)
-          if entry.exception?
-            format_exception(entry)
-          elsif entry.message
+          if entry.message
             if entry.payload.empty?
               entry.message
             else
@@ -75,27 +73,8 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        def format_exception(entry)
-          log_line = [
-            format_payload(entry.payload.slice(:exception, :message)),
-            format_payload(entry.payload.except(*Entry::EXCEPTION_PAYLOAD_KEYS))
-          ].reject(&:empty?).join(SEPARATOR)
-
-          trace_line = format_backtrace(entry)
-
-          "#{log_line}#{NEW_LINE}#{trace_line}"
-        end
-
-        # @since 1.0.0
-        # @api private
         def format_payload(entry)
           entry.map { |key, value| "#{key}=#{value.inspect}" }.join(SEPARATOR)
-        end
-
-        # @since 1.0.0
-        # @api private
-        def format_backtrace(entry)
-          entry[:backtrace].map { |line| "#{TAB}#{line}" }.join(NEW_LINE)
         end
 
         # @since 1.0.0
