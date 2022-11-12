@@ -94,6 +94,9 @@ Metrics/CyclomaticComplexity:
   Enabled: true
   Max: 12
 
+Style/MapToHash:
+  Enabled: false
+
 Style/ExponentialNotation:
   Enabled: false
 

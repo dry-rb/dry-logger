@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require "dry/logger/formatters/structured"
+require "set"
+
+require_relative "template"
+require_relative "structured"
 
 module Dry
   module Logger
@@ -26,17 +29,13 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        DEFAULT_TEMPLATE = "%<message>s"
-
-        # @since 1.0.0
-        # @api private
         attr_reader :template
 
         # @since 1.0.0
         # @api private
-        def initialize(template: DEFAULT_TEMPLATE, **options)
+        def initialize(template: Logger.templates[:default], **options)
           super(**options)
-          @template = template
+          @template = Template[template]
         end
 
         private
@@ -44,7 +43,14 @@ module Dry
         # @since 1.0.0
         # @api private
         def format(entry)
-          "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
+          if template.include?(:message)
+            "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
+          else
+            [
+              template % format_payload_values(entry),
+              format_payload(entry.payload.except(*template.tokens))
+            ].reject(&:empty?).join(SEPARATOR)
+          end
         end
 
         # @since 1.0.0
@@ -75,6 +81,17 @@ module Dry
         # @api private
         def format_payload(entry)
           entry.map { |key, value| "#{key}=#{value.inspect}" }.join(HASH_SEPARATOR)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_payload_values(entry)
+          entry
+            .to_h
+            .map { |key, value|
+              [key, respond_to?(meth = "format_#{key}") ? __send__(meth, value) : value]
+            }
+            .to_h
         end
       end
     end
