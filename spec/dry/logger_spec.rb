@@ -33,6 +33,22 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
+  context "adding backends via block only" do
+    include_context "stream"
+
+    it "doesn't setup the default logger" do
+      logger = Dry.Logger(:test, stream: stream) { |setup|
+        setup.add_backend(formatter: :string, template: "[%<severity>s] %<message>s")
+      }
+
+      expect(logger.backends.size).to be(1)
+
+      logger.info "Hello World!"
+
+      expect(output).to eql("[INFO] Hello World!\n")
+    end
+  end
+
   context "registering a custom template" do
     subject(:logger) { Dry.Logger(:test, template: :details) }
 

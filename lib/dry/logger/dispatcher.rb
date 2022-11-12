@@ -53,6 +53,7 @@ module Dry
       # @api public
       def self.setup(id, **options)
         dispatcher = new(id, **DEFAULT_OPTS, **options)
+        yield(dispatcher) if block_given?
         dispatcher.add_backend if dispatcher.backends.empty?
         dispatcher
       end
