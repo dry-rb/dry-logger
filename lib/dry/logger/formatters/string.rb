@@ -47,7 +47,7 @@ module Dry
             "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
           else
             [
-              template % entry.to_h,
+              template % format_payload_values(entry),
               format_payload(entry.payload.except(*template.tokens))
             ].reject(&:empty?).join(SEPARATOR)
           end
@@ -81,6 +81,17 @@ module Dry
         # @api private
         def format_payload(entry)
           entry.map { |key, value| "#{key}=#{value.inspect}" }.join(HASH_SEPARATOR)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_payload_values(entry)
+          entry
+            .to_h
+            .map { |key, value|
+              [key, respond_to?(meth = "format_#{key}") ? __send__(meth, value) : value]
+            }
+            .to_h
         end
       end
     end

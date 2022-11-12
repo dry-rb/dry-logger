@@ -4,7 +4,11 @@ RSpec.describe Dry::Logger::Formatters::String do
   include_context "stream"
 
   subject(:logger) do
-    Dry.Logger(:test, stream: stream, template: template)
+    Dry.Logger(:test, stream: stream, formatter: formatter, template: template)
+  end
+
+  let(:formatter) do
+    described_class
   end
 
   before do
@@ -60,6 +64,32 @@ RSpec.describe Dry::Logger::Formatters::String do
       logger.info verb: "POST", path: "/users", foo: "bar"
 
       expect(output).to eql(%([INFO] POST /users foo="bar"))
+    end
+  end
+
+  describe "using customized formatter" do
+    let(:formatter) do
+      Class.new(described_class) do
+        def format_verb(value)
+          "VERB:#{value}"
+        end
+      end
+    end
+
+    let(:template) do
+      "[%<severity>s] %<verb>s %<path>s"
+    end
+
+    it "replaces tokens with payload values using custom formatting methods" do
+      logger.info verb: "POST", path: "/users"
+
+      expect(output).to eql("[INFO] VERB:POST /users")
+    end
+
+    it "replaces tokens with payload values and dumps payload's remainder" do
+      logger.info verb: "POST", path: "/users", foo: "bar"
+
+      expect(output).to eql(%([INFO] VERB:POST /users foo="bar"))
     end
   end
 end
