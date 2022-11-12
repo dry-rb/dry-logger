@@ -29,15 +29,11 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        DEFAULT_TEMPLATE = "%<message>s"
-
-        # @since 1.0.0
-        # @api private
         attr_reader :template
 
         # @since 1.0.0
         # @api private
-        def initialize(template: DEFAULT_TEMPLATE, **options)
+        def initialize(template: Logger.templates[:default], **options)
           super(**options)
           @template = Template[template]
         end

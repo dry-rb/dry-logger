@@ -29,3 +29,16 @@ end
 Dir.glob(Pathname.new(__dir__).join("shared", "**", "*.rb")).sort.each do |file|
   require_relative file
 end
+
+RSpec.configure do |config|
+  global_registries = %i[formatters templates]
+
+  config.around do |example|
+    reg_state = global_registries.to_h { |reg| [reg, Dry::Logger.__send__(reg)] }
+    example.run
+  ensure
+    reg_state.each do |reg, val|
+      Dry::Logger.instance_variable_set("@#{reg}", val)
+    end
+  end
+end

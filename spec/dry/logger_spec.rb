@@ -33,6 +33,24 @@ RSpec.describe "Dry.Logger" do
     end
   end
 
+  context "registering a custom template" do
+    subject(:logger) { Dry.Logger(:test, template: :details) }
+
+    before do
+      Dry::Logger.register_template(:details, "[%<severity>s] [%<time>s] %<message>s")
+    end
+
+    it "logs to $stdout by default using a registered template" do
+      message = "hello, world"
+
+      output = with_captured_stdout do
+        logger.info(message)
+      end
+
+      expect(output).to eql("[INFO] [2017-01-15 16:00:23 +0100] hello, world\n")
+    end
+  end
+
   context "using external logger as backend" do
     include_context "stream"
 
