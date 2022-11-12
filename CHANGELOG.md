@@ -7,6 +7,9 @@
 
 - Support arbitrary logging backends through proxy (via #12) (@solnic)
 - Support for conditional logging when using arbitrary logging backends (via #13) (@solnic)
+- Support for registering templates via `Dry::Logger.register_template` (via #14) (@solnic)
+- Support for payload keys as template tokens (via #14) (@solnic)
+- Support for payload value formatter methods, ie if there's `:verb` token your formatter can implement `format_verb(value)` (via #14) (@solnic)
 
 
 [Compare v1.0.0.rc2...master](https://github.com/dry-rb/dry-logger/compare/v1.0.0.rc2...master)
