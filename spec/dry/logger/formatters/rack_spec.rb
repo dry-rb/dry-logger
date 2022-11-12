@@ -42,15 +42,15 @@ RSpec.describe Dry::Logger::Formatters::Rack do
 
   let(:filtered_params) do
     {"password" => "[FILTERED]",
-    "password_confirmation" => "[FILTERED]",
-    "credit_card" => {
-      "number" => "[FILTERED]",
-      "name" => "[FILTERED]"
-    },
-    "user" => {
-      "login" => "[FILTERED]",
-      "name" => "John"
-    }}
+     "password_confirmation" => "[FILTERED]",
+     "credit_card" => {
+       "number" => "[FILTERED]",
+       "name" => "[FILTERED]"
+     },
+     "user" => {
+       "login" => "[FILTERED]",
+       "name" => "John"
+     }}
   end
 
   context "with filters" do
