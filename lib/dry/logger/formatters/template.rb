@@ -2,6 +2,7 @@
 
 require "set"
 require "dry/logger/constants"
+require_relative "colors"
 
 module Dry
   module Logger
@@ -32,13 +33,31 @@ module Dry
         # @since 1.0.0
         # @api private
         def self.[](value)
-          cache.fetch(value) { cache[value] = Template.new(value) }
+          cache.fetch(value) {
+            cache[value] = (colorized?(value) ? Template::Colorized : Template).new(value)
+          }
+        end
+
+        # @since 1.0.0
+        # @api private
+        private_class_method def self.colorized?(value)
+          Colors::COLORS.keys.any? { |color| value.include?("<#{color}>") }
         end
 
         # @since 1.0.0
         # @api private
         private_class_method def self.cache
           @cache ||= {}
+        end
+
+        # @since 1.0.0
+        # @api private
+        class Colorized < Template
+          # @since 1.0.0
+          # @api private
+          def initialize(value)
+            super(Colors.evaluate(value))
+          end
         end
 
         # @since 1.0.0
@@ -54,6 +73,12 @@ module Dry
           output = value % tokens
           output.strip!
           output.split(NEW_LINE).map(&:rstrip).join(NEW_LINE)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def colorize(color, input)
+          "\e[#{Colors[color.to_sym]}m#{input}\e[0m"
         end
 
         # @since 1.0.0

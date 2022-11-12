@@ -64,6 +64,18 @@ RSpec.describe Dry::Logger::Formatters::String do
     end
   end
 
+  describe "using colorized template" do
+    let(:template) do
+      "[%<severity>s] <green>%<verb>s</green> <cyan>%<path>s</cyan>"
+    end
+
+    it "replaces tokens with colorized payload values" do
+      logger.info verb: "POST", path: "/users"
+
+      expect(output).to eql("[INFO] \e[32mPOST\e[0m \e[36m/users\e[0m\n")
+    end
+  end
+
   describe "using customized formatter" do
     let(:formatter) do
       Class.new(described_class) do
