@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require "set"
-require "dry/logger/formatters/structured"
+
+require_relative "template"
+require_relative "structured"
 
 module Dry
   module Logger
@@ -27,15 +29,7 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        TOKEN_REGEXP = %r[%<(\w*)>s].freeze
-
-        # @since 1.0.0
-        # @api private
-        MESSAGE_TOKEN = "%<message>s"
-
-        # @since 1.0.0
-        # @api private
-        DEFAULT_TEMPLATE = MESSAGE_TOKEN
+        DEFAULT_TEMPLATE = "%<message>s"
 
         # @since 1.0.0
         # @api private
@@ -43,14 +37,9 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        attr_reader :tokens
-
-        # @since 1.0.0
-        # @api private
         def initialize(template: DEFAULT_TEMPLATE, **options)
           super(**options)
-          @template = template
-          @tokens = template.scan(TOKEN_REGEXP).flatten(1).map(&:to_sym).to_set
+          @template = Template[template]
         end
 
         private
@@ -58,12 +47,12 @@ module Dry
         # @since 1.0.0
         # @api private
         def format(entry)
-          if tokens.include?(:message)
+          if template.include?(:message)
             "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
           else
             [
               template % entry.to_h,
-              format_payload(entry.payload.except(*tokens))
+              format_payload(entry.payload.except(*template.tokens))
             ].reject(&:empty?).join(SEPARATOR)
           end
         end
