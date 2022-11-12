@@ -53,7 +53,7 @@ module Dry
             [
               template % format_payload_values(entry),
               format_payload(entry.payload.except(*template.tokens))
-            ].reject(&:empty?).map(&:strip).join(SEPARATOR)
+            ].reject(&:empty?).map(&:strip).join(SEPARATOR) + NEW_LINE
           end
         end
 

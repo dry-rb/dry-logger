@@ -57,7 +57,7 @@ RSpec.describe Dry::Logger::Formatters::Rack do
     it "filters values for keys in the filters array" do
       logger.info(payload)
 
-      expect(output).to eql(<<~LOG.strip)
+      expect(output).to eql(<<~LOG)
         [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
         #{filtered_params}
       LOG
@@ -71,7 +71,7 @@ RSpec.describe Dry::Logger::Formatters::Rack do
 
       logger.error(exception, **payload)
 
-      expected = <<~LOG.strip
+      expected = <<~LOG
         [test] [ERROR] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
         #{filtered_params} \
         exception=StandardError message="foo" \

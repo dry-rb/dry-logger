@@ -57,13 +57,13 @@ RSpec.describe Dry::Logger::Formatters::String do
     it "replaces tokens with payload values" do
       logger.info verb: "POST", path: "/users"
 
-      expect(output).to eql("[INFO] POST /users")
+      expect(output).to eql("[INFO] POST /users\n")
     end
 
     it "replaces tokens with payload values and dumps payload's remainder" do
       logger.info verb: "POST", path: "/users", foo: "bar"
 
-      expect(output).to eql(%([INFO] POST /users foo="bar"))
+      expect(output).to eql(%([INFO] POST /users foo="bar"\n))
     end
   end
 
@@ -83,13 +83,13 @@ RSpec.describe Dry::Logger::Formatters::String do
     it "replaces tokens with payload values using custom formatting methods" do
       logger.info verb: "POST", path: "/users"
 
-      expect(output).to eql("[INFO] VERB:POST /users")
+      expect(output).to eql("[INFO] VERB:POST /users\n")
     end
 
     it "replaces tokens with payload values and dumps payload's remainder" do
       logger.info verb: "POST", path: "/users", foo: "bar"
 
-      expect(output).to eql(%([INFO] VERB:POST /users foo="bar"))
+      expect(output).to eql(%([INFO] VERB:POST /users foo="bar"\n))
     end
   end
 end
