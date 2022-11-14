@@ -101,14 +101,12 @@ module Dry
 
           if data[:message]
             data.except(*payload.keys)
+          elsif template.include?(:message)
+            data[:message] = data.delete(:payload)
+            data[:payload] = nil
+            data
           else
-            if template.include?(:message)
-              data[:message] = data.delete(:payload)
-              data[:payload] = nil
-              data
-            else
-              data
-            end
+            data
           end
         end
       end
