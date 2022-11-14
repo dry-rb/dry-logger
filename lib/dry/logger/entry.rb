@@ -12,14 +12,6 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      EMPTY_PAYLOAD = {}.freeze
-
-      # @since 1.0.0
-      # @api private
-      EMPTY_BACKTRACE = [].freeze
-
-      # @since 1.0.0
-      # @api private
       EXCEPTION_PAYLOAD_KEYS = %i[exception message backtrace].freeze
 
       # @since 1.0.0
@@ -41,7 +33,10 @@ module Dry
       # @since 1.0.0
       # @api public
       attr_reader :message
-      alias_method :exception, :message
+
+      # @since 1.0.0
+      # @api public
+      attr_reader :exception
 
       # @since 1.0.0
       # @api public
@@ -49,12 +44,13 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(progname:, severity:, time: Time.now, message: nil, payload: EMPTY_PAYLOAD)
+      def initialize(progname:, severity:, time: Time.now, message: nil, payload: EMPTY_HASH)
         @progname = progname
         @severity = severity.to_s.upcase # TODO: this doesn't feel right
         @level = LEVELS.fetch(severity.to_s)
         @time = time
-        @message = message
+        @message = message unless message.is_a?(Exception)
+        @exception = message if message.is_a?(Exception)
         @payload = build_payload(payload)
       end
 
@@ -103,7 +99,7 @@ module Dry
       # @since 1.0.0
       # @api public
       def exception?
-        message.is_a?(Exception)
+        !exception.nil?
       end
 
       # @since 1.0.0
@@ -114,27 +110,20 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def to_h
-        @to_h ||= meta.merge(payload)
-      end
-
-      # @since 1.0.0
-      # @api private
       def meta
         @meta ||= {progname: progname, severity: severity, time: time}
       end
 
       # @since 1.0.0
       # @api private
-      def utc_time
-        @utc_time ||= time.utc.iso8601
+      def to_h
+        @to_h ||= meta.merge(message: message, **payload)
       end
 
       # @since 1.0.0
       # @api private
       def as_json
-        # TODO: why are we enforcing UTC in JSON but not in String?
-        @as_json ||= to_h.merge(message: message, time: utc_time).compact
+        @as_json ||= to_h.merge(time: utc_time, **exception_hash).compact
       end
 
       # @since 1.0.0
@@ -150,13 +139,28 @@ module Dry
       # @api private
       def build_payload(payload)
         if exception?
-          {exception: exception.class,
-           message: exception.message,
-           backtrace: exception.backtrace || EMPTY_BACKTRACE,
-           **payload}
+          {exception: exception, **payload}
         else
           payload
         end
+      end
+
+      # @since 1.0.0
+      # @api private
+      def exception_hash
+        return EMPTY_HASH unless exception?
+
+        {
+          exception: exception.class,
+          message: exception.message,
+          backtrace: exception.backtrace || EMPTY_ARRAY
+        }
+      end
+
+      # @since 1.0.0
+      # @api private
+      def utc_time
+        @utc_time ||= time.utc.iso8601
       end
     end
   end

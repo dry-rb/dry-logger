@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "set"
+require "dry/logger/constants"
 
 module Dry
   module Logger
@@ -50,7 +51,9 @@ module Dry
         # @since 1.0.0
         # @api private
         def %(tokens)
-          value % tokens
+          output = value % tokens
+          output.strip!
+          output.split(NEW_LINE).map(&:rstrip).join(NEW_LINE)
         end
 
         # @since 1.0.0
