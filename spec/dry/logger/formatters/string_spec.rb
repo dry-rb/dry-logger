@@ -13,7 +13,7 @@ RSpec.describe Dry::Logger::Formatters::String do
 
   describe "using customized template with `message` token" do
     let(:template) do
-      "[%<progname>s] [%<severity>s] [%<time>s] %<message>s"
+      "[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s"
     end
 
     it "when passed as a symbol, it has key=value format for string messages" do
@@ -35,7 +35,8 @@ RSpec.describe Dry::Logger::Formatters::String do
       logger.error(exception)
 
       expected = <<~STR
-        [test] [ERROR] [2017-01-15 16:00:23 +0100] exception=StandardError message="foo"
+        [test] [ERROR] [2017-01-15 16:00:23 +0100]
+          foo (StandardError)
           file-1.rb:312
           file-2.rb:12
           file-3.rb:115
@@ -47,7 +48,7 @@ RSpec.describe Dry::Logger::Formatters::String do
 
   describe "using customized template with payload keys as tokens" do
     let(:template) do
-      "[%<severity>s] %<verb>s %<path>s"
+      "[%<severity>s] %<verb>s %<path>s %<payload>s"
     end
 
     it "replaces tokens with payload values" do
@@ -73,7 +74,7 @@ RSpec.describe Dry::Logger::Formatters::String do
     end
 
     let(:template) do
-      "[%<severity>s] %<verb>s %<path>s"
+      "[%<severity>s] %<verb>s %<path>s %<payload>s"
     end
 
     it "replaces tokens with payload values using custom formatting methods" do

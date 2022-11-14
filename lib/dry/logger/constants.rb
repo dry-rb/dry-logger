@@ -4,6 +4,18 @@ require "logger"
 
 module Dry
   module Logger
+    # @since 1.0.0
+    # @api private
+    NEW_LINE = $/ # rubocop:disable Style/SpecialGlobalVars
+
+    # @since 1.0.0
+    # @api private
+    EMPTY_ARRAY = [].freeze
+
+    # @since 1.0.0
+    # @api private
+    EMPTY_HASH = {}.freeze
+
     LOG_METHODS = %i[debug error fatal info warn].freeze
 
     BACKEND_METHODS = %i[close].freeze

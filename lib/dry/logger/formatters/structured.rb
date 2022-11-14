@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "logger"
+
+require "dry/logger/constants"
 require "dry/logger/filter"
 
 module Dry
@@ -20,10 +22,6 @@ module Dry
         # @since 1.0.0
         # @api private
         NOOP_FILTER = -> message { message }
-
-        # @since 1.0.0
-        # @api private
-        NEW_LINE = $/ # rubocop:disable Style/SpecialGlobalVars
 
         # @since 1.0.0
         # @api private

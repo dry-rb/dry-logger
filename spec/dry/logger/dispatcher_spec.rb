@@ -95,7 +95,7 @@ RSpec.describe Dry::Logger::Dispatcher do
   end
 
   describe "#tagged" do
-    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s", context: {}) }
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s %<payload>s", context: {}) }
 
     it "sets tags in log entries" do
       logger.tagged(:metrics) do
@@ -109,7 +109,7 @@ RSpec.describe Dry::Logger::Dispatcher do
   end
 
   describe "#context" do
-    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s", context: {}) }
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<message>s %<payload>s", context: {}) }
 
     it "allows set pre-defined payload data" do
       logger.context[:component] = "test"

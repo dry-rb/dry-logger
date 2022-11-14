@@ -54,8 +54,8 @@ RSpec.describe Dry::Logger::Formatters::Rack do
       logger.info(payload)
 
       expect(output).to eql(<<~LOG)
-        [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
-        #{filtered_params}
+        [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312
+          #{filtered_params}
       LOG
     end
   end
@@ -68,10 +68,12 @@ RSpec.describe Dry::Logger::Formatters::Rack do
       logger.error(exception, **payload)
 
       expected = <<~LOG
-        [test] [ERROR] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312 \
-        #{filtered_params} \
-        exception=StandardError message="foo" \
-        backtrace=["file-1.rb:312", "file-2.rb:12", "file-3.rb:115"]
+        [test] [ERROR] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312
+          #{filtered_params}
+          foo (StandardError)
+          file-1.rb:312
+          file-2.rb:12
+          file-3.rb:115
       LOG
 
       expect(output).to eql(expected)

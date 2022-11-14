@@ -39,7 +39,7 @@ module Dry
         # @api private
         def initialize(template: Logger.templates[:default], **options)
           super(**options)
-          @template = Template[template]
+          @template = Template[*template]
         end
 
         private
@@ -47,66 +47,69 @@ module Dry
         # @since 1.0.0
         # @api private
         def format(entry)
-          if template.include?(:message)
-            "#{template % entry.meta.merge(message: format_entry(entry))}#{NEW_LINE}"
-          else
-            [
-              template % format_payload_values(entry),
-              format_payload(entry.payload.except(*template.tokens))
-            ].reject(&:empty?).map(&:strip).join(SEPARATOR) + NEW_LINE
-          end
-        end
+          output =
+            if entry.exception?
+              head = template % template_data(entry, exclude: %i[exception])
+              tail = format_exception(entry.exception)
 
-        # @since 1.0.0
-        # @api private
-        def format_entry(entry)
-          if entry.exception?
-            format_exception(entry)
-          elsif entry.message
-            if entry.payload.empty?
-              entry.message
+              "#{head}#{NEW_LINE}#{TAB}#{tail}"
             else
-              "#{entry.message}#{SEPARATOR}#{format_payload(entry)}"
+              template % template_data(entry)
             end
-          else
-            format_payload(entry)
-          end
+
+          "#{output}#{NEW_LINE}"
         end
 
         # @since 1.0.0
         # @api private
-        def format_exception(entry)
-          log_line = [
-            format_payload(entry.payload.slice(:exception, :message)),
-            format_payload(entry.payload.except(*Entry::EXCEPTION_PAYLOAD_KEYS))
-          ].reject(&:empty?).join(SEPARATOR)
-
-          trace_line = format_backtrace(entry)
-
-          "#{log_line}#{NEW_LINE}#{trace_line}"
+        def format_exception(value)
+          [
+            "#{value.message} (#{value.class})",
+            format_backtrace(value.backtrace || EMPTY_BACKTRACE)
+          ].join(NEW_LINE)
         end
 
         # @since 1.0.0
         # @api private
-        def format_payload(entry)
-          entry.map { |key, value| "#{key}=#{value.inspect}" }.join(SEPARATOR)
+        def format_payload(payload)
+          payload.map { |key, value| "#{key}=#{value.inspect}" }.join(SEPARATOR)
         end
 
         # @since 1.0.0
         # @api private
-        def format_backtrace(entry)
-          entry[:backtrace].map { |line| "#{TAB}#{line}" }.join(NEW_LINE)
+        def format_backtrace(value)
+          value.map { |line| "#{TAB}#{line}" }.join(NEW_LINE)
         end
 
         # @since 1.0.0
         # @api private
-        def format_payload_values(entry)
+        def format_values(entry)
           entry
             .to_h
             .map { |key, value|
-              [key, respond_to?(meth = "format_#{key}") ? __send__(meth, value) : value]
+              [key, respond_to?(meth = "format_#{key}", true) ? __send__(meth, value) : value]
             }
             .to_h
+        end
+
+        # @since 1.0.0
+        # @api private
+        def template_data(entry, exclude: [])
+          data = format_values(entry)
+          payload = data.except(:message, *entry.meta.keys, *template.tokens, *exclude)
+          data[:payload] = format_payload(payload)
+
+          if data[:message]
+            data.except(*payload.keys)
+          else
+            if template.include?(:message)
+              data[:message] = data.delete(:payload)
+              data[:payload] = nil
+              data
+            else
+              data
+            end
+          end
         end
       end
     end

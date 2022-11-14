@@ -151,11 +151,12 @@ module Dry
     register_formatter(:rack, Formatters::Rack)
     register_formatter(:json, Formatters::JSON)
 
-    register_template(:default, "%<message>s")
+    register_template(:default, "%<message>s %<payload>s")
 
     register_template(:rack, <<~STR)
       [%<progname>s] [%<severity>s] [%<time>s] \
-      %<verb>s %<status>s %<elapsed>s %<ip>s %<path>s %<length>s %<params>s
+      %<verb>s %<status>s %<elapsed>s %<ip>s %<path>s %<length>s %<payload>s
+        %<params>s
     STR
   end
 end
