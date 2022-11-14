@@ -94,7 +94,7 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        def template_data(entry, exclude: [])
+        def template_data(entry, exclude: EMPTY_ARRAY)
           data = format_values(entry)
           payload = data.except(:message, *entry.meta.keys, *template.tokens, *exclude)
           data[:payload] = format_payload(payload)
