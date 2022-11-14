@@ -11,10 +11,6 @@ RSpec.describe Dry::Logger::Formatters::String do
     described_class
   end
 
-  before do
-    allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
-  end
-
   describe "using customized template with `message` token" do
     let(:template) do
       "[%<progname>s] [%<severity>s] [%<time>s] %<message>s"

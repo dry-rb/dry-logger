@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe Dry::Logger::Formatters::JSON do
-  before do
-    allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
+  include_context "stream"
+
+  subject(:logger) do
+    Dry.Logger(:test, stream: stream, formatter: :json)
   end
 
   it "when passed as a symbol, it has JSON format for string messages" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: :json).info("foo")
-    end
+    logger.info("foo")
 
     expected_json = {
       "progname" => "test",
@@ -22,9 +22,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
   end
 
   it "has JSON format for string messages" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info("foo")
-    end
+    logger.info("foo")
 
     expect(JSON.parse(output)).to eql(
       "progname" => "test",
@@ -35,9 +33,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
   end
 
   it "has JSON format for string messages with payloads" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info("foo", test: true)
-    end
+    logger.info("foo", test: true)
 
     expect(JSON.parse(output)).to eql(
       "progname" => "test",
@@ -49,9 +45,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
   end
 
   it "has JSON format for error messages" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).error(Exception.new("foo"))
-    end
+    logger.error(Exception.new("foo"))
 
     expect(JSON.parse(output)).to eql(
       "progname" => "test",
@@ -64,9 +58,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
   end
 
   it "has JSON format for hash messages" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(foo: :bar)
-    end
+    logger.info(foo: :bar)
 
     expect(JSON.parse(output)).to eql(
       "progname" => "test",
@@ -77,9 +69,7 @@ RSpec.describe Dry::Logger::Formatters::JSON do
   end
 
   it "has JSON format for not string messages" do
-    output = with_captured_stdout do
-      Dry.Logger(:test, formatter: Dry::Logger::Formatters::JSON.new).info(["foo"])
-    end
+    logger.info(["foo"])
 
     expect(JSON.parse(output)).to eql(
       "progname" => "test",

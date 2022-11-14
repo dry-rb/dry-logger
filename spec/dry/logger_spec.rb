@@ -1,23 +1,19 @@
 # frozen_string_literal: true
 
-RSpec.describe "Dry.Logger" do
-  before do
-    allow(Time).to receive(:now).and_return(DateTime.parse("2017-01-15 16:00:23 +0100").to_time)
-  end
+RSpec.describe Dry::Logger do
+  include_context "stream"
 
   it "raises on unsupported stream type" do
     expect { Dry.Logger(:test, stream: []) }.to raise_error(ArgumentError, /unsupported/)
   end
 
   context "default" do
-    subject(:logger) { Dry.Logger(:test) }
+    subject(:logger) { Dry.Logger(:test, stream: stream) }
 
     it "logs to $stdout by default using a plain text message" do
       message = "hello, world"
 
-      output = with_captured_stdout do
-        logger.info(message)
-      end
+       logger.info(message)
 
       expect(output).to match(message)
     end
@@ -25,17 +21,13 @@ RSpec.describe "Dry.Logger" do
     it "logs to $stdout by default using a plain text message and payload" do
       message = "hello, world"
 
-      output = with_captured_stdout do
-        logger.info(message, test: true)
-      end
+       logger.info(message, test: true)
 
       expect(output).to match("#{message} test=true")
     end
   end
 
   context "adding backends via block only" do
-    include_context "stream"
-
     it "doesn't setup the default logger" do
       logger = Dry.Logger(:test, stream: stream) { |setup|
         setup.add_backend(formatter: :string, template: "[%<severity>s] %<message>s")
@@ -50,7 +42,7 @@ RSpec.describe "Dry.Logger" do
   end
 
   context "registering a custom template" do
-    subject(:logger) { Dry.Logger(:test, template: :details) }
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: :details) }
 
     before do
       Dry::Logger.register_template(:details, "[%<severity>s] [%<time>s] %<message>s")
@@ -59,18 +51,14 @@ RSpec.describe "Dry.Logger" do
     it "logs to $stdout by default using a registered template" do
       message = "hello, world"
 
-      output = with_captured_stdout do
-        logger.info(message)
-      end
+       logger.info(message)
 
       expect(output).to eql("[INFO] [2017-01-15 16:00:23 +0100] hello, world\n")
     end
   end
 
   context "using external logger as backend" do
-    include_context "stream"
-
-    subject(:logger) { Dry.Logger(:test).add_backend(backend) }
+    subject(:logger) { Dry.Logger(:test, stream: stream).add_backend(backend) }
 
     context "with an stdlib logger" do
       let(:backend) { Logger.new(stream) }
@@ -218,70 +206,12 @@ RSpec.describe "Dry.Logger" do
   end
 
   describe "with nil formatter" do
-    subject(:logger) { Dry.Logger(:test, formatter: nil) }
+    subject(:logger) { Dry.Logger(:test, stream: stream, formatter: nil) }
 
-    it "falls back to Formatter" do
-      output = with_captured_stdout do
-        logger.info("foo")
-      end
+    it "falls back to string formatter" do
+      logger.info("foo")
 
       expect(output).to eq "foo\n"
-    end
-  end
-
-  describe "#close" do
-    subject(:logger) { Dry.Logger(:test, stream: stream) }
-
-    before do
-      logger.close
-    end
-
-    context "when stream is $stdout" do
-      let(:stream) { $stdout }
-
-      it "does not close stream" do
-        expect { print "in $stdout" }.to output("in $stdout").to_stdout
-      end
-    end
-
-    context "when stream is $stdout" do
-      let(:stream) { $stdout }
-
-      it "does not close stream" do
-        expect { print "in $stdout" }.to output("in $stdout").to_stdout
-      end
-    end
-
-    context "when file" do
-      let(:stream) { random_file_name }
-
-      it "closes stream" do
-        logger.info(message = "foo")
-
-        expect(read(stream)).to_not match(message)
-      end
-    end
-
-    context "when StringIO" do
-      let(:stream) { StringIO.new }
-
-      it "closes stream" do
-        logger.info("foo")
-
-        expect { read(stream) }.to raise_error(IOError)
-      end
-    end
-
-    context "when IO" do
-      let(:stream) { io_stream(destination) }
-      let(:destination) { file_with_directory }
-
-      it "closes stream" do
-        logger.info(message = "foo")
-        logger.close
-
-        expect(read(destination)).to_not match(message)
-      end
     end
   end
 end
