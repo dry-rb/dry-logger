@@ -11,6 +11,8 @@
 - Support for payload keys as template tokens (via #14) (@solnic)
 - Support for payload value formatter methods, ie if there's `:verb` token your formatter can implement `format_verb(value)` (via #14) (@solnic)
 - Support block-based setup (via #16) (@solnic)
+- Support for defining cherry-picked keys from the payload in string templates (via #17) (@solnic)
+- Support for `%<payload>s` template token. It will be replaced by a formatted payload, excluding any key that you specified explicitly in the template (via #17) (@solnic)
 
 ### Changed
 
