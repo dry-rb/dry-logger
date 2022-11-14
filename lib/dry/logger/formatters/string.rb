@@ -39,7 +39,7 @@ module Dry
         # @api private
         def initialize(template: Logger.templates[:default], **options)
           super(**options)
-          @template = Template[*template]
+          @template = Template[template]
         end
 
         private
