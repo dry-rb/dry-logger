@@ -42,11 +42,34 @@ module Dry
   #   logger.info(Hello: "World!")
   #   # {"progname":"my_app","severity":"INFO","time":"2022-11-06T10:11:29Z","Hello":"World!"}
   #
+  # @example Setting up multiple backends
+  #   logger = Dry.Logger(:my_app)
+  #     add_backend(formatter: :string, template: :details)
+  #     add_backend(formatter: :string, template: :details)
+  #
+  # @example Setting up conditional logging
+  #   logger = Dry.Logger(:my_app) { |setup|
+  #     setup.add_backend(formatter: :string, template: :details) { |b| b.log_if = :error?.to_proc }
+  #   }
+  #
+  # @param [String, Symbol] id The dispatcher id, can be used as progname in log entries
+  # @param [Hash] options Options for backends and formatters
+  # @option options [Symbol] :level (optional) The minimum level that should be logged,
+  #   default is :info
+  # @option options [Symbol] :stream (optional) The output stream, default is $stdout
+  # @option options [Symbol, Class, #call] :formatter (optional) The default formatter or its id,
+  #   default is :string
+  # @option options [String, Symbol] :template (optional) The default template that should be used
+  #   or its id
+  # @option options [Boolean] :colorize (optional) Enable/disable colorized severity
+  #   in string formatters
+  # @option options [Hash<Symbol=>Symbol>] :severity_colors (optional) A severity=>color mapping
+  #
   # @since 1.0.0
-  # @return [Dispatcher]
   # @api public
-  def self.Logger(id, **opts, &block)
-    Logger::Dispatcher.setup(id, **opts, &block)
+  # @return [Dispatcher]
+  def self.Logger(id, **options, &block)
+    Logger::Dispatcher.setup(id, **options, &block)
   end
 
   module Logger

@@ -10,6 +10,8 @@ module Dry
     module Formatters
       # Default structured formatter which receives {Logger::Entry} from the backends.
       #
+      # This class can be used as the base class for your custom formatters.
+      #
       # @see http://www.ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger/Formatter.html
       #
       # @since 1.0.0

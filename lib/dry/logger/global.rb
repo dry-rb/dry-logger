@@ -12,12 +12,21 @@ module Dry
       #
       # @example
       #   class MyFormatter < Dry::Logger::Formatters::Structured
-      #     def format(entry)
-      #       "WOAH: #{entry.message}"
+      #     def format_message(value)
+      #       "WOAH: #{message}"
+      #     end
+      #
+      #     def format_time(value)
+      #       Time.now.strftime("%Y-%m-%d %H:%M:%S")
       #     end
       #   end
       #
-      #   Dry::Logger.register_formatter(MyFormatter)
+      #   Dry::Logger.register_formatter(:my_formatter, MyFormatter)
+      #
+      #   logger = Dry.Logger(:app, formatter: :my_formatter, template: :details)
+      #
+      #   logger.info "Hello World"
+      #   # [test] [INFO] [2022-11-15 10:06:29] WOAH: Hello World
       #
       # @since 1.0.0
       # @return [Hash]
@@ -29,13 +38,18 @@ module Dry
 
       # Register a new template
       #
-      # @example
+      # @example basic template
       #   Dry::Logger.register_template(:request, "[%<severity>s] %<verb>s %<path>s")
       #
       #   logger = Dry.Logger(:my_app, template: :request)
       #
       #   logger.info(verb: "GET", path: "/users")
       #   # [INFO] GET /users
+      #
+      # @example template with colors
+      #   Dry::Logger.register_template(
+      #     :request, "[%<severity>s] <green>%<verb>s</green> <blue>%<path>s</blue>"
+      #   )
       #
       # @since 1.0.0
       # @return [Hash]

@@ -49,12 +49,9 @@ module Dry
       # Set up a dispatcher
       #
       # @since 1.0.0
-      #
-      # @param [String, Symbol] id The dispatcher id, can be used as progname in log entries
-      # @param [Hash] options Options that can be used for both the backend and formatter
+      # @api private
       #
       # @return [Dispatcher]
-      # @api public
       def self.setup(id, **options)
         dispatcher = new(id, **DEFAULT_OPTS, **options)
         yield(dispatcher) if block_given?
@@ -150,8 +147,25 @@ module Dry
 
       # Pass logging to all configured backends
       #
+      # @example logging a message
+      #   logger.log(:info, "Hello World")
+      #
+      # @example logging payload
+      #   logger.log(:info, verb: "GET", path: "/users")
+      #
+      # @example logging message and payload
+      #   logger.log(:info, "User index request", verb: "GET", path: "/users")
+      #
+      # @example logging exception
+      #   begin
+      #     # things that may raise
+      #   rescue => e
+      #     logger.log(:error, e)
+      #     raise e
+      #   end
+      #
       # @param [Symbol] severity The log severity name
-      # @param [String,Symbol,Array] message Optional message object
+      # @param [String] message Optional message
       # @param [Hash] payload Optional log entry payload
       #
       # @since 1.0.0
@@ -222,7 +236,7 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def each_backend(*_args, &block)
+      def each_backend(&block)
         mutex.synchronize do
           backends.each(&block)
         end
