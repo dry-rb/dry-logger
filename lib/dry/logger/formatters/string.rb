@@ -31,6 +31,17 @@ module Dry
         # @api private
         EXCEPTION_SEPARATOR = ": "
 
+        # @since 1.2.0
+        # @api private
+        DEFAULT_SEVERITY_COLORS = {
+          DEBUG => :cyan,
+          INFO => :magenta,
+          WARN => :yellow,
+          ERROR => :red,
+          FATAL => :red,
+          UNKNOWN => :blue
+        }.freeze
+
         # @since 1.0.0
         # @api private
         attr_reader :template
@@ -42,7 +53,25 @@ module Dry
           @template = Template[template]
         end
 
+        # @since 1.0.0
+        # @api private
+        def colorize?
+          options[:colorize].equal?(true)
+        end
+
         private
+
+        # @since 1.0.0
+        # @api private
+        def format_severity(value)
+          output = value.upcase
+
+          if colorize?
+            Colors.call(severity_colors[LEVELS[value]], output)
+          else
+            output
+          end
+        end
 
         # @since 1.0.0
         # @api private
@@ -94,6 +123,15 @@ module Dry
           else
             data
           end
+        end
+
+        # @since 1.0.0
+        # @api private
+        def severity_colors
+          @severity_colors ||= DEFAULT_SEVERITY_COLORS.merge(
+            (options[:severity_colors] || EMPTY_HASH)
+              .to_h { |key, value| [LEVELS[key.to_s], value] }
+          )
         end
       end
     end

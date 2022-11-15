@@ -43,7 +43,7 @@ module Dry
       def initialize(clock:, progname:, severity:, message: nil, payload: EMPTY_HASH)
         @clock = clock
         @progname = progname
-        @severity = severity.to_s.upcase # TODO: this doesn't feel right
+        @severity = severity.to_s
         @level = LEVELS.fetch(severity.to_s)
         @message = message unless message.is_a?(Exception)
         @exception = message if message.is_a?(Exception)

@@ -4,11 +4,15 @@ RSpec.describe Dry::Logger::Formatters::String do
   include_context "stream"
 
   subject(:logger) do
-    Dry.Logger(:test, stream: stream, formatter: formatter, template: template)
+    Dry.Logger(:test, stream: stream, formatter: formatter, template: template, **options)
   end
 
   let(:formatter) do
     described_class
+  end
+
+  let(:options) do
+    {}
   end
 
   describe "using customized template with `message` token" do
@@ -61,6 +65,48 @@ RSpec.describe Dry::Logger::Formatters::String do
       logger.info verb: "POST", path: "/users", foo: "bar"
 
       expect(output).to eql(%([INFO] POST /users foo="bar"\n))
+    end
+  end
+
+  describe "using colorized template" do
+    let(:template) do
+      "[%<severity>s] <green>%<verb>s</green> <cyan>%<path>s</cyan>"
+    end
+
+    it "replaces tokens with colorized payload values" do
+      logger.info verb: "POST", path: "/users"
+
+      expect(output).to eql("[INFO] \e[32mPOST\e[0m \e[36m/users\e[0m\n")
+    end
+  end
+
+  describe "using colorized mode" do
+    let(:template) do
+      "[%<severity>s] %<message>s"
+    end
+
+    context "with default severity colors" do
+      let(:options) do
+        {colorize: true}
+      end
+
+      it "colorizes severity" do
+        logger.info "Hello World"
+
+        expect(output).to eql("[\e[35mINFO\e[0m] Hello World\n")
+      end
+    end
+
+    context "with customized severity colors" do
+      let(:options) do
+        {colorize: true, severity_colors: {info: :blue}}
+      end
+
+      it "colorizes severity using custom color" do
+        logger.info "Hello World"
+
+        expect(output).to eql("[\e[34mINFO\e[0m] Hello World\n")
+      end
     end
   end
 
