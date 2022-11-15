@@ -52,11 +52,15 @@ module Dry
   module Logger
     extend Global
 
+    # Built-in formatters
     register_formatter(:string, Formatters::String)
     register_formatter(:rack, Formatters::Rack)
     register_formatter(:json, Formatters::JSON)
 
+    # Built-in templates
     register_template(:default, "%<message>s %<payload>s")
+
+    register_template(:details, "[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s")
 
     register_template(:rack, <<~STR)
       [%<progname>s] [%<severity>s] [%<time>s] \

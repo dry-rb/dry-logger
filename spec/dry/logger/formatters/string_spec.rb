@@ -15,21 +15,63 @@ RSpec.describe Dry::Logger::Formatters::String do
     {}
   end
 
+  describe "using :default template" do
+    let(:template) do
+      :default
+    end
+
+    it "logs message" do
+      logger.info "Hello World"
+      expect(output).to eql("Hello World\n")
+    end
+
+    it "logs payload" do
+      logger.info text: "Hello World"
+      expect(output).to eql(%[text="Hello World"\n])
+    end
+
+    it "logs message and payload" do
+      logger.info "Hello World", more: "data"
+      expect(output).to eql(%[Hello World more="data"\n])
+    end
+  end
+
+  describe "using :details template" do
+    let(:template) do
+      :details
+    end
+
+    it "logs message" do
+      logger.info "Hello World"
+      expect(output).to eql("[test] [INFO] [2017-01-15 16:00:23 +0100] Hello World\n")
+    end
+
+    it "logs payload" do
+      logger.info text: "Hello World"
+      expect(output).to eql(%[[test] [INFO] [2017-01-15 16:00:23 +0100] text="Hello World"\n])
+    end
+
+    it "logs message and payload" do
+      logger.info "Hello World", more: "data"
+      expect(output).to eql(%[[test] [INFO] [2017-01-15 16:00:23 +0100] Hello World more="data"\n])
+    end
+  end
+
   describe "using customized template with `message` token" do
     let(:template) do
-      "[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s"
+      "[%<progname>s] [%<severity>s] [%<time>s] [message:%<message>s] %<payload>s"
     end
 
     it "when passed as a symbol, it has key=value format for string messages" do
       logger.info("foo")
 
-      expect(output).to eq "[test] [INFO] [2017-01-15 16:00:23 +0100] foo\n"
+      expect(output).to eq "[test] [INFO] [2017-01-15 16:00:23 +0100] [message:foo]\n"
     end
 
     it "has key=value format for hash messages" do
       logger.info(foo: "bar")
 
-      expect(output).to eq %([test] [INFO] [2017-01-15 16:00:23 +0100] foo="bar"\n)
+      expect(output).to eq %([test] [INFO] [2017-01-15 16:00:23 +0100] [message:foo="bar"]\n)
     end
 
     it "has key=value format for error messages" do
@@ -39,7 +81,7 @@ RSpec.describe Dry::Logger::Formatters::String do
       logger.error(exception)
 
       expected = <<~STR
-        [test] [ERROR] [2017-01-15 16:00:23 +0100]
+        [test] [ERROR] [2017-01-15 16:00:23 +0100] [message:]
           foo (StandardError)
           file-1.rb:312
           file-2.rb:12
