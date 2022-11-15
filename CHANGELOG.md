@@ -13,6 +13,8 @@
 - Support block-based setup (via #16) (@solnic)
 - Support for defining cherry-picked keys from the payload in string templates (via #17) (@solnic)
 - Support for `%<payload>s` template token. It will be replaced by a formatted payload, excluding any key that you specified explicitly in the template (via #17) (@solnic)
+- Support for colorized output using color tags in templates (via #18) (@solnic)
+- Support for `colorize: true` logger option which enables severity coloring in string formatter (via #18) (@solnic)
 
 ### Changed
 
