@@ -25,6 +25,12 @@ module Dry
 
         # @since 0.1.0
         # @api private
+        def format_severity(value)
+          value.upcase
+        end
+
+        # @since 0.1.0
+        # @api private
         def format_exception(value)
           {
             exception: value.class,
