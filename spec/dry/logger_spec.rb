@@ -13,7 +13,7 @@ RSpec.describe Dry::Logger do
     it "logs to $stdout by default using a plain text message" do
       message = "hello, world"
 
-       logger.info(message)
+      logger.info(message)
 
       expect(output).to match(message)
     end
@@ -21,7 +21,7 @@ RSpec.describe Dry::Logger do
     it "logs to $stdout by default using a plain text message and payload" do
       message = "hello, world"
 
-       logger.info(message, test: true)
+      logger.info(message, test: true)
 
       expect(output).to match("#{message} test=true")
     end
@@ -51,7 +51,7 @@ RSpec.describe Dry::Logger do
     it "logs to $stdout by default using a registered template" do
       message = "hello, world"
 
-       logger.info(message)
+      logger.info(message)
 
       expect(output).to eql("[INFO] [2017-01-15 16:00:23 +0100] hello, world\n")
     end

@@ -27,12 +27,12 @@ RSpec.describe Dry::Logger::Formatters::String do
 
     it "logs payload" do
       logger.info text: "Hello World"
-      expect(output).to eql(%[text="Hello World"\n])
+      expect(output).to eql(%(text="Hello World"\n))
     end
 
     it "logs message and payload" do
       logger.info "Hello World", more: "data"
-      expect(output).to eql(%[Hello World more="data"\n])
+      expect(output).to eql(%(Hello World more="data"\n))
     end
   end
 
@@ -48,12 +48,12 @@ RSpec.describe Dry::Logger::Formatters::String do
 
     it "logs payload" do
       logger.info text: "Hello World"
-      expect(output).to eql(%[[test] [INFO] [2017-01-15 16:00:23 +0100] text="Hello World"\n])
+      expect(output).to eql(%([test] [INFO] [2017-01-15 16:00:23 +0100] text="Hello World"\n))
     end
 
     it "logs message and payload" do
       logger.info "Hello World", more: "data"
-      expect(output).to eql(%[[test] [INFO] [2017-01-15 16:00:23 +0100] Hello World more="data"\n])
+      expect(output).to eql(%([test] [INFO] [2017-01-15 16:00:23 +0100] Hello World more="data"\n))
     end
   end
 
