@@ -42,10 +42,10 @@ RSpec.describe Dry::Logger do
   end
 
   context "registering a custom template" do
-    subject(:logger) { Dry.Logger(:test, stream: stream, template: :details) }
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: :my_details) }
 
     before do
-      Dry::Logger.register_template(:details, "[%<severity>s] [%<time>s] %<message>s")
+      Dry::Logger.register_template(:my_details, "[%<severity>s] [%<time>s] %<message>s")
     end
 
     it "logs to $stdout by default using a registered template" do
