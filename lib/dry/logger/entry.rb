@@ -11,10 +11,6 @@ module Dry
       include Enumerable
 
       # @since 1.0.0
-      # @api private
-      EXCEPTION_PAYLOAD_KEYS = %i[exception message backtrace].freeze
-
-      # @since 1.0.0
       # @api public
       attr_reader :progname
 
@@ -122,12 +118,6 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def as_json
-        @as_json ||= to_h.merge(time: clock.now_utc.iso8601, **exception_hash).compact
-      end
-
-      # @since 1.0.0
-      # @api private
       def filter(filter)
         @payload = filter.call(payload)
         self
@@ -143,18 +133,6 @@ module Dry
         else
           payload
         end
-      end
-
-      # @since 1.0.0
-      # @api private
-      def exception_hash
-        return EMPTY_HASH unless exception?
-
-        {
-          exception: exception.class,
-          message: exception.message,
-          backtrace: exception.backtrace || EMPTY_ARRAY
-        }
       end
     end
   end

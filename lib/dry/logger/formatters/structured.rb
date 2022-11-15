@@ -61,7 +61,18 @@ module Dry
         # @return [Entry]
         # @api public
         def format(entry)
+          format_values(entry)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def format_values(entry)
           entry
+            .to_h
+            .map { |key, value|
+              [key, respond_to?(meth = "format_#{key}", true) ? __send__(meth, value) : value]
+            }
+            .to_h
         end
       end
     end

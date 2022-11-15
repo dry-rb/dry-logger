@@ -83,17 +83,6 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        def format_values(entry)
-          entry
-            .to_h
-            .map { |key, value|
-              [key, respond_to?(meth = "format_#{key}", true) ? __send__(meth, value) : value]
-            }
-            .to_h
-        end
-
-        # @since 1.0.0
-        # @api private
         def template_data(entry, exclude: EMPTY_ARRAY)
           data = format_values(entry)
           payload = data.except(:message, *entry.meta.keys, *template.tokens, *exclude)

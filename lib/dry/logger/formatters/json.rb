@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "json"
+
+require "dry/logger/constants"
 require "dry/logger/formatters/structured"
 
 module Dry
@@ -16,7 +18,25 @@ module Dry
         # @since 0.1.0
         # @api private
         def format(entry)
-          "#{::JSON.generate(entry.as_json)}#{NEW_LINE}"
+          hash = format_values(entry).compact
+          hash.update(hash.delete(:exception)) if entry.exception?
+          ::JSON.dump(hash) + NEW_LINE
+        end
+
+        # @since 0.1.0
+        # @api private
+        def format_exception(value)
+          {
+            exception: value.class,
+            message: value.message,
+            backtrace: value.backtrace || EMPTY_ARRAY
+          }
+        end
+
+        # @since 0.1.0
+        # @api private
+        def format_time(value)
+          value.getutc.iso8601
         end
       end
     end
