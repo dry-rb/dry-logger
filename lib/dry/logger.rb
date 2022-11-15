@@ -54,16 +54,12 @@ module Dry
   #
   # @param [String, Symbol] id The dispatcher id, can be used as progname in log entries
   # @param [Hash] options Options for backends and formatters
-  # @option options [Symbol] :level (optional) The minimum level that should be logged,
-  #   default is :info
+  # @option options [Symbol] :level (:info) The minimum level that should be logged,
   # @option options [Symbol] :stream (optional) The output stream, default is $stdout
-  # @option options [Symbol, Class, #call] :formatter (optional) The default formatter or its id,
-  #   default is :string
-  # @option options [String, Symbol] :template (optional) The default template that should be used
-  #   or its id
-  # @option options [Boolean] :colorize (optional) Enable/disable colorized severity
-  #   in string formatters
-  # @option options [Hash<Symbol=>Symbol>] :severity_colors (optional) A severity=>color mapping
+  # @option options [Symbol, Class, #call] :formatter (:string) The default formatter or its id,
+  # @option options [String, Symbol] :template (:default) The default template that should be used
+  # @option options [Boolean] :colorize (false) Enable/disable colorized severity
+  # @option options [Hash<Symbol=>Symbol>] :severity_colors ({}) A severity=>color mapping
   #
   # @since 1.0.0
   # @api public
