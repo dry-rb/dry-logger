@@ -20,7 +20,7 @@ module Dry
         def format(entry)
           hash = format_values(entry).compact
           hash.update(hash.delete(:exception)) if entry.exception?
-          ::JSON.dump(hash) + NEW_LINE
+          ::JSON.dump(hash)
         end
 
         # @since 0.1.0

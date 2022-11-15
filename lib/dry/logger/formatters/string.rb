@@ -47,17 +47,14 @@ module Dry
         # @since 1.0.0
         # @api private
         def format(entry)
-          output =
-            if entry.exception?
-              head = template % template_data(entry, exclude: %i[exception])
-              tail = format_exception(entry.exception)
+          if entry.exception?
+            head = template % template_data(entry, exclude: %i[exception])
+            tail = format_exception(entry.exception)
 
-              "#{head}#{NEW_LINE}#{TAB}#{tail}"
-            else
-              template % template_data(entry)
-            end
-
-          "#{output}#{NEW_LINE}"
+            "#{head}#{NEW_LINE}#{TAB}#{tail}"
+          else
+            template % template_data(entry)
+          end
         end
 
         # @since 1.0.0

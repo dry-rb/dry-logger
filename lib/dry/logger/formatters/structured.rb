@@ -50,7 +50,7 @@ module Dry
         # @return [String]
         # @api public
         def call(_severity, _time, _progname, entry)
-          format(entry.filter(filter))
+          format(entry.filter(filter)) + NEW_LINE
         end
 
         # Format entry into a loggable object
