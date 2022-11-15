@@ -19,6 +19,12 @@ module Dry
           super
           @template = Template[Logger.templates[:rack]]
         end
+
+        # @api 1.0.0
+        # @api private
+        def format_params(value)
+          return value unless value.empty?
+        end
       end
     end
   end

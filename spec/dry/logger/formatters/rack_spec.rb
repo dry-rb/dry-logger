@@ -49,13 +49,23 @@ RSpec.describe Dry::Logger::Formatters::Rack do
      }}
   end
 
-  context "with filters" do
+  context "with params" do
     it "filters values for keys in the filters array" do
       logger.info(payload)
 
       expect(output).to eql(<<~LOG)
         [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312
           #{filtered_params}
+      LOG
+    end
+  end
+
+  context "with empty params" do
+    it "filters values for keys in the filters array" do
+      logger.info(payload.merge(params: {}))
+
+      expect(output).to eql(<<~LOG)
+        [test] [INFO] [2017-01-15 16:00:23 +0100] POST 200 2ms 127.0.0.1 /api/users 312
       LOG
     end
   end
