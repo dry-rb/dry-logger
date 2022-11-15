@@ -3,6 +3,7 @@
 require "stringio"
 
 require "dry/logger/constants"
+require "dry/logger/clock"
 require "dry/logger/dispatcher"
 
 require "dry/logger/formatters/string"

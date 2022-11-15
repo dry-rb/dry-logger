@@ -28,10 +28,6 @@ module Dry
 
       # @since 1.0.0
       # @api public
-      attr_reader :time
-
-      # @since 1.0.0
-      # @api public
       attr_reader :message
 
       # @since 1.0.0
@@ -44,11 +40,15 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(progname:, severity:, time: Time.now, message: nil, payload: EMPTY_HASH)
+      attr_reader :clock
+
+      # @since 1.0.0
+      # @api private
+      def initialize(clock:, progname:, severity:, message: nil, payload: EMPTY_HASH)
+        @clock = clock
         @progname = progname
         @severity = severity.to_s.upcase # TODO: this doesn't feel right
         @level = LEVELS.fetch(severity.to_s)
-        @time = time
         @message = message unless message.is_a?(Exception)
         @exception = message if message.is_a?(Exception)
         @payload = build_payload(payload)
@@ -111,7 +111,7 @@ module Dry
       # @since 1.0.0
       # @api private
       def meta
-        @meta ||= {progname: progname, severity: severity, time: time}
+        @meta ||= {progname: progname, severity: severity, time: clock.now}
       end
 
       # @since 1.0.0
@@ -123,7 +123,7 @@ module Dry
       # @since 1.0.0
       # @api private
       def as_json
-        @as_json ||= to_h.merge(time: utc_time, **exception_hash).compact
+        @as_json ||= to_h.merge(time: clock.now_utc.iso8601, **exception_hash).compact
       end
 
       # @since 1.0.0
@@ -155,12 +155,6 @@ module Dry
           message: exception.message,
           backtrace: exception.backtrace || EMPTY_ARRAY
         }
-      end
-
-      # @since 1.0.0
-      # @api private
-      def utc_time
-        @utc_time ||= time.utc.iso8601
       end
     end
   end

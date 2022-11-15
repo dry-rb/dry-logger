@@ -40,6 +40,10 @@ module Dry
 
       # @since 1.0.0
       # @api private
+      attr_reader :clock
+
+      # @since 1.0.0
+      # @api private
       attr_reader :mutex
 
       # Set up a dispatcher
@@ -72,6 +76,7 @@ module Dry
         @options = {**options, progname: id}
         @mutex = Mutex.new
         @context = context
+        @clock = Clock.new(**(options[:clock] || EMPTY_HASH))
       end
 
       # Log an entry with UNKNOWN severity
@@ -157,6 +162,7 @@ module Dry
         when Hash then log(severity, nil, **message)
         else
           entry = Entry.new(
+            clock: clock,
             progname: id,
             severity: severity,
             message: message,
