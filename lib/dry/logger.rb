@@ -60,6 +60,8 @@ module Dry
   # @option options [String, Symbol] :template (:default) The default template that should be used
   # @option options [Boolean] :colorize (false) Enable/disable colorized severity
   # @option options [Hash<Symbol=>Symbol>] :severity_colors ({}) A severity=>color mapping
+  # @option options [#call] :on_crash (Dry::Logger::Dispatcher::ON_CRASH) A crash-handling proc.
+  #   This is used whenever logging crashes.
   #
   # @since 1.0.0
   # @api public
