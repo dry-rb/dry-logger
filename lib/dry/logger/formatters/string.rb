@@ -88,6 +88,20 @@ module Dry
 
         # @since 1.0.0
         # @api private
+        def format_tags(value)
+          Array(value)
+            .map { |tag|
+              case tag
+              when Hash then format_payload(tag)
+              else
+                tag.to_s
+              end
+            }
+            .join(SEPARATOR)
+        end
+
+        # @since 1.0.0
+        # @api private
         def format_exception(value)
           [
             "#{value.message} (#{value.class})",
@@ -113,6 +127,10 @@ module Dry
           data = format_values(entry)
           payload = data.except(:message, *entry.meta.keys, *template.tokens, *exclude)
           data[:payload] = format_payload(payload)
+
+          if template.include?(:tags)
+            data[:tags] = format_tags(entry.tags)
+          end
 
           if data[:message]
             data.except(*payload.keys)

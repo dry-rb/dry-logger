@@ -20,6 +20,10 @@ module Dry
 
       # @since 1.0.0
       # @api public
+      attr_reader :tags
+
+      # @since 1.0.0
+      # @api public
       attr_reader :level
 
       # @since 1.0.0
@@ -40,15 +44,19 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(clock:, progname:, severity:, message: nil, payload: EMPTY_HASH)
+      # rubocop:disable Metrics/ParameterLists
+      def initialize(clock:, progname:, severity:, tags: EMPTY_ARRAY, message: nil,
+                     payload: EMPTY_HASH)
         @clock = clock
         @progname = progname
         @severity = severity.to_s
+        @tags = tags
         @level = LEVELS.fetch(severity.to_s)
         @message = message unless message.is_a?(Exception)
         @exception = message if message.is_a?(Exception)
         @payload = build_payload(payload)
       end
+      # rubocop:enable Metrics/ParameterLists
 
       # @since 1.0.0
       # @api public
@@ -102,6 +110,12 @@ module Dry
       # @api public
       def key?(name)
         payload.key?(name)
+      end
+
+      # @since 1.0.0
+      # @api public
+      def tag?(value)
+        tags.include?(value)
       end
 
       # @since 1.0.0
