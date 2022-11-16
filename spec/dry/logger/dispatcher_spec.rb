@@ -17,6 +17,59 @@ RSpec.describe Dry::Logger::Dispatcher do
         expect(stream).to include(message)
       end
     end
+
+    describe "##{level} when a custom backend crashes" do
+      subject(:logger) do
+        Dry.Logger(:test, stream: stream, level: level) do |setup|
+          setup.add_backend { |backend| backend.log_if = -> _ { raise(exception) } }
+        end
+      end
+
+      let(:exception) do
+        StandardError.new("Oops").tap { |e| e.set_backtrace(["file-1.rb:12", "file-2.rb:41"]) }
+      end
+
+      it "uses on_crash callback" do
+        # message = <<~LOG
+        #   [test] [FATAL] [2017-01-15 16:00:23 +0100] Logging crashed
+        #     Hello World!
+        #     Oops (StandardError)
+        #     file-1.rb:12
+        #     file-2.rb:41
+        # LOG
+        #
+        # TODO: for some reason output matcher doesn't work here
+        # .     so this is going to spit things out in the test output
+        expect { logger.public_send(level, "Hello World!") }.to_not raise_error
+      end
+    end
+
+    describe "##{level} when dispatching crashes" do
+      subject(:logger) do
+        Dry.Logger(:test, stream: stream, level: level)
+      end
+
+      let(:exception) do
+        StandardError.new("Oops").tap { |e| e.set_backtrace(["file-1.rb:12", "file-2.rb:41"]) }
+      end
+
+      it "uses on_crash callback" do
+        # message = <<~LOG
+        #   [test] [FATAL] [2017-01-15 16:00:23 +0100] Logging crashed
+        #     Hello World!
+        #     Oops (StandardError)
+        #     file-1.rb:12
+        #     file-2.rb:41
+        # LOG
+        #
+        # TODO: for some reason output matcher doesn't work here
+        # .     so this is going to spit things out in the test output
+
+        allow(Dry::Logger::Entry).to receive(:new).and_raise(exception)
+
+        expect { logger.public_send(level, "Hello World!") }.to_not raise_error
+      end
+    end
   end
 
   describe "#add_backend" do

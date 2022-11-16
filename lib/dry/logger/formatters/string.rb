@@ -17,14 +17,6 @@ module Dry
       class String < Structured
         # @since 1.0.0
         # @api private
-        SEPARATOR = " "
-
-        # @since 1.0.0
-        # @api private
-        TAB = SEPARATOR * 2
-
-        # @since 1.0.0
-        # @api private
         HASH_SEPARATOR = ","
 
         # @since 1.0.0

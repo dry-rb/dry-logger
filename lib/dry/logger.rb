@@ -81,6 +81,13 @@ module Dry
 
     register_template(:details, "[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s")
 
+    register_template(:crash, <<~STR)
+      [%<progname>s] [%<severity>s] [%<time>s] Logging crashed
+        %<log_entry>s
+        %<message>s (%<exception>s)
+      %<backtrace>s
+    STR
+
     register_template(:rack, <<~STR)
       [%<progname>s] [%<severity>s] [%<time>s] \
       %<verb>s %<status>s %<elapsed>s %<ip>s %<path>s %<length>s %<payload>s

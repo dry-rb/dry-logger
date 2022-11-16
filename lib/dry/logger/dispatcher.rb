@@ -44,7 +44,32 @@ module Dry
 
       # @since 1.0.0
       # @api private
+      attr_reader :on_crash
+
+      # @since 1.0.0
+      # @api private
       attr_reader :mutex
+
+      # @since 1.0.0
+      # @api private
+      CRASH_LOGGER = ::Logger.new($stdout).tap { |logger|
+        logger.formatter = -> (_, _, _, message) { "#{message}#{NEW_LINE}" }
+        logger.level = FATAL
+      }.freeze
+
+      # @since 1.0.0
+      # @api private
+      ON_CRASH = -> (progname:, exception:, message:, payload:) {
+        CRASH_LOGGER.fatal(Logger.templates[:crash] % {
+          severity: "FATAL",
+          progname: progname,
+          time: Time.now,
+          log_entry: [message, payload].map(&:to_s).reject(&:empty?).join(SEPARATOR),
+          exception: exception.class,
+          message: exception.message,
+          backtrace: TAB + exception.backtrace.join(NEW_LINE + TAB)
+        })
+      }
 
       # Set up a dispatcher
       #
@@ -77,6 +102,7 @@ module Dry
         @context = context
         @tags = tags
         @clock = Clock.new(**(options[:clock] || EMPTY_HASH))
+        @on_crash = options[:on_crash] || ON_CRASH
       end
 
       # Log an entry with UNKNOWN severity
@@ -189,9 +215,14 @@ module Dry
 
           each_backend do |backend|
             backend.__send__(severity, entry) if backend.log?(entry)
+          rescue StandardError => e
+            on_crash.(progname: id, exception: e, message: message, payload: payload)
           end
         end
 
+        true
+      rescue StandardError => e
+        on_crash.(progname: id, exception: e, message: message, payload: payload)
         true
       end
 
