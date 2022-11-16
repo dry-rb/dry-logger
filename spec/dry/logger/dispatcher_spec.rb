@@ -95,18 +95,68 @@ RSpec.describe Dry::Logger::Dispatcher do
   end
 
   describe "#tagged" do
-    subject(:logger) do
-      Dry.Logger(:test, stream: stream, template: "%<message>s %<payload>s", context: {})
-    end
+    context "when template doesn't include tags" do
+      subject(:logger) do
+        Dry.Logger(:test, stream: stream, context: {}) { |setup|
+          setup.add_backend do |backend|
+            backend.log_if = -> entry { !entry.tag?(:rack) }
+          end
 
-    it "sets tags in log entries" do
-      logger.tagged(:metrics) do
-        logger.info("test 1")
-        logger.info("test 2")
+          setup.add_backend(template: "request: %<verb>s %<path>s") do |backend|
+            backend.log_if = -> entry { entry.tag?(:rack) }
+          end
+        }
       end
 
-      expect(stream).to include("test 1 tag=:metrics")
-      expect(stream).to include("test 2 tag=:metrics")
+      it "allows filterring by tags but doesn't include them in log entries" do
+        logger.info("Hello World")
+
+        logger.tagged(:rack) do
+          logger.info(verb: "GET", path: "/users")
+        end
+
+        expect(stream.string).to include("Hello World\n")
+        expect(stream.string).to include("request: GET /users\n")
+      end
+    end
+
+    context "when template include tags" do
+      subject(:logger) do
+        Dry.Logger(
+          :test,
+          stream: stream, template: "[%<tags>s] %<message>s %<payload>s", context: {}
+        )
+      end
+
+      it "includes tags as symbols in log entries" do
+        logger.tagged(:metrics) do
+          logger.info("test 1")
+          logger.info("test 2")
+        end
+
+        expect(stream).to include("[metrics] test 1")
+        expect(stream).to include("[metrics] test 2")
+      end
+
+      it "includes tags as hashes in log entries" do
+        logger.tagged(metrics: true) do
+          logger.info("test 1")
+          logger.info("test 2")
+        end
+
+        expect(stream).to include("[metrics=true] test 1")
+        expect(stream).to include("[metrics=true] test 2")
+      end
+
+      it "includes tags as symbols and hashes in log entries" do
+        logger.tagged(:analytics, metrics: true) do
+          logger.info("test 1")
+          logger.info("test 2")
+        end
+
+        expect(stream).to include("[analytics metrics=true] test 1")
+        expect(stream).to include("[analytics metrics=true] test 2")
+      end
     end
   end
 

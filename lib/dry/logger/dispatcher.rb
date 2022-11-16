@@ -67,12 +67,15 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def initialize(id, backends: [], context: self.class.default_context, **options)
+      def initialize(
+        id, backends: [], tags: [], context: self.class.default_context, **options
+      )
         @id = id
         @backends = backends
         @options = {**options, progname: id}
         @mutex = Mutex.new
         @context = context
+        @tags = tags
         @clock = Clock.new(**(options[:clock] || EMPTY_HASH))
       end
 
@@ -179,6 +182,7 @@ module Dry
             clock: clock,
             progname: id,
             severity: severity,
+            tags: @tags,
             message: message,
             payload: {**context, **payload}
           )
@@ -204,11 +208,11 @@ module Dry
       #
       # @since 1.0.0
       # @api public
-      def tagged(tag)
-        context[:tag] = tag
+      def tagged(*tags)
+        @tags.concat(tags)
         yield
       ensure
-        context.delete(:tag)
+        @tags = []
       end
 
       # Add a new backend to an existing dispatcher
