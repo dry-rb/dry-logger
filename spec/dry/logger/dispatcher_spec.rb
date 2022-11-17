@@ -84,9 +84,7 @@ RSpec.describe Dry::Logger::Dispatcher do
 
     it "adds a new backend with conditional dispatch" do
       logger
-        .add_backend(formatter: :string, template: "first: %<message>s") { |backend|
-          backend.log_if = -> entry { entry.info? }
-        }
+        .add_backend(formatter: :string, template: "first: %<message>s", log_if: :info?)
         .add_backend(formatter: :string, template: "second: %<message>s")
 
       logger.info("hello")

@@ -6,9 +6,24 @@ module Dry
   module Logger
     module Backends
       module Core
-        # @since 0.1.0
+        # Return a proc used by the log? predicate
+        #
+        # @since 1.0.0
+        # @api private
+        attr_reader :log_if
+
+        # Set a predicate proc that checks if an entry should be logged by a given backend
+        #
+        # The predicate will receive {Entry} as its argument and should return true/false
+        #
+        # @param [Proc, #to_proc] spec A proc-like object
+        # @return [self]
+        # @since 1.0.0
         # @api public
-        attr_accessor :log_if
+        def log_if=(spec)
+          @log_if = spec&.to_proc
+          self
+        end
 
         # @since 1.0.0
         # @api private
