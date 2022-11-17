@@ -17,12 +17,10 @@ module Dry
         # The predicate will receive {Entry} as its argument and should return true/false
         #
         # @param [Proc, #to_proc] spec A proc-like object
-        # @return [self]
         # @since 1.0.0
         # @api public
         def log_if=(spec)
           @log_if = spec&.to_proc
-          self
         end
 
         # @since 1.0.0
