@@ -10,13 +10,13 @@ dry-logger provides a standalone, dependency-free logging solution suitable for 
 - Structured logging *by default*
 - Logging to multiple destinations via pluggable logging `backends`
 - Fine-grained log formatting using `formatters`
-- Customizable loggging logic via log filtering
+- Customizable logging logic via log filtering
 - Out-of-the-box exception logging
-- Built-in support for text log templates with customizable colorized ouput
+- Built-in support for text log templates with customizable colorized output
 - Built-in support for tagged log entries
 - Public API for adding your own `backends` and `formatters`
 
-# Basic setup
+### Basic setup
 
 To configure a basic `$stdout` logger simply use the main setup method `Dry.Logger`:
 
@@ -39,7 +39,7 @@ logger.info "Hello World"
 # [test] [INFO] [2022-11-17 11:43:52 +0100] Hello World
 ```
 
-# Using multiple logging destinations
+### Using multiple logging destinations
 
 You can configure your logger to log to more than one destination. In case of the default logger,
 the destination is set to `$stdout`. Let's say you want to log both to `$stdout` and a file:
@@ -52,7 +52,7 @@ logger.info "Hello World"
 # [test] [INFO] [2022-11-17 11:46:12 +0100] Hello World
 ```
 
-# Conditional logging
+### Conditional logging
 
 You can tell your backends when exactly they should be logging using `log_if` option. It can be set
 to either a symbol that represents a method that `Dry::Logger::Entry` implements or a custom proc.
@@ -72,7 +72,7 @@ logger.info "GET /posts", request: true
 # [test] [INFO] [2022-11-17 11:51:50 +0100] GET /posts request=true
 ```
 
-# Using custom templates
+### Using custom templates
 
 You can provide customized text log templates using regular Ruby syntax for tokenized string templates:
 
@@ -101,7 +101,7 @@ logger.info verb: "GET", path: "/users"
 # [INFO] GET /users
 ```
 
-# Using colorized text output
+### Using colorized text output
 
 You can use simple color tags to colorize specific values in the text output:
 
@@ -124,7 +124,7 @@ Following built-in color tags are supported:
 - cyan
 - gray
 
-# Customizing formatters
+### Customizing formatters
 
 There are three built-in formatters:
 
