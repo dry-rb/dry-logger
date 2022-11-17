@@ -1,52 +1,25 @@
 ---
-- version: unreleased
-  summary: 
-  date: 
-  fixed: 
-  added:
-  - 'Support arbitrary logging backends through proxy (via #12) (@solnic)'
-  - 'Support for conditional logging when using arbitrary logging backends (via #13)
-    (@solnic)'
-  - 'Support for registering templates via `Dry::Logger.register_template` (via #14)
-    (@solnic)'
-  - 'Support for payload keys as template tokens (via #14) (@solnic)'
-  - 'Support for payload value formatter methods, ie if there''s `:verb` token your
-    formatter can implement `format_verb(value)` (via #14) (@solnic)'
-  - 'Support block-based setup (via #16) (@solnic)'
-  - 'Support for defining cherry-picked keys from the payload in string templates
-    (via #17) (@solnic)'
-  - 'Support for `%<payload>s` template token. It will be replaced by a formatted
-    payload, excluding any key that you specified explicitly in the template (via
-    #17) (@solnic)'
-  - 'Support for colorized output using color tags in templates (via #18) (@solnic)'
-  - 'Support for `colorize: true` logger option which enables severity coloring in
-    string formatter (via #18) (@solnic)'
-  - '`:details` template: `"[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s"`
-    (@solnic)'
-  - 'A new option `on_crash` for setting up a logger-crash handling proc (via #21)
-    (@solnic)'
-  - 'Handle logger crashes by default using a simple `$stdout` logger (via #21) (@solnic)'
-  changed:
-  - "`:rack` formatter uses a dedicated template now (via #11) (@solnic)"
-- version: 1.0.0.rc2
-  date: 2022-11-08
-  added:
-  - Support for regular logger backends that don't support `log?` predicate (@solnic)
-  changed:
-  - Renamed `Dispatcher#call=>forward` because some libraries use `#call` in a different
-    way (@solnic)
-  fixed:
-  - Added missing require of 'stringio' (@solnic)
-- version: 1.0.0.rc1
+- version: 1.0.0
   summary: |
     This is a port of the original Hanami logger from hanami-utils extended with support for logging
-    dispatchers that can log to different destinations.
-  date: 2022-11-07
-  fixed: 
+    dispatchers that can log to different destinations and plenty more.
+  fixed:
   added:
-  - 'Support for providing a string template for log entries via `template` option
-    (via #7) (@solnic)'
-  - "`:rack` string log formatter which inlines request info and displays params at
-    the end (@solnic)"
+  - 'Support arbitrary logging backends through proxy (via #12) (@solnic)'
+  - 'Support for conditional logging when using arbitrary logging backends (via #13) (@solnic)'
+  - 'Support for registering templates via `Dry::Logger.register_template` (via #14) (@solnic)'
+  - 'Support for payload keys as template tokens (via #14) (@solnic)'
+  - 'Support for payload value formatter methods, ie if there''s `:verb` token your formatter can implement `format_verb(value)` (via #14) (@solnic)'
+  - 'Support block-based setup (via #16) (@solnic)'
+  - 'Support for defining cherry-picked keys from the payload in string templates (via #17) (@solnic)'
+  - 'Support for `%<payload>s` template token. It will be replaced by a formatted payload, excluding any key that you specified explicitly in the template (via #17) (@solnic)'
+  - 'Support for colorized output using color tags in templates (via #18) (@solnic)'
+  - 'Support for `colorize: true` logger option which enables severity coloring in string formatter (via #18) (@solnic)'
+  - '`:details` template: `"[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s"` (@solnic)'
+  - 'A new option `on_crash` for setting up a logger-crash handling proc (via #21) (@solnic)'
+  - 'Handle logger crashes by default using a simple `$stdout` logger (via #21) (@solnic)'
+  - "Support for regular logger backends that don't support `log?` predicate (@solnic)"
+  - 'Support for providing a string template for log entries via `template` option (via #7) (@solnic)'
+  - "`:rack` string log formatter which inlines request info and displays params at the end (@solnic)"
   - 'Conditional log dispatch via `#log_if` backend''s predicate (via #9) (@solnic)'
   - 'Add support for shared context and tagged log entries (via #10) (@solnic)'
