@@ -17,8 +17,12 @@ RSpec.shared_context "stream" do
     end.new
   end
 
-  let(:output) do
-    stream.string
+  def output(*args)
+    if args.empty?
+      stream.string
+    else
+      super
+    end
   end
 
   let(:now) do

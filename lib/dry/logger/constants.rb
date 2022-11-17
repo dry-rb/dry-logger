@@ -10,13 +10,21 @@ module Dry
 
     # @since 1.0.0
     # @api private
+    SEPARATOR = " "
+
+    # @since 1.0.0
+    # @api private
+    TAB = SEPARATOR * 2
+
+    # @since 1.0.0
+    # @api private
     EMPTY_ARRAY = [].freeze
 
     # @since 1.0.0
     # @api private
     EMPTY_HASH = {}.freeze
 
-    LOG_METHODS = %i[debug error fatal info warn].freeze
+    LOG_METHODS = %i[debug info warn error fatal unknown].freeze
 
     BACKEND_METHODS = %i[close].freeze
 
