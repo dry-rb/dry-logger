@@ -16,6 +16,8 @@
 - Support for colorized output using color tags in templates (via #18) (@solnic)
 - Support for `colorize: true` logger option which enables severity coloring in string formatter (via #18) (@solnic)
 - `:details` template: `"[%<progname>s] [%<severity>s] [%<time>s] %<message>s %<payload>s"` (@solnic)
+- A new option `on_crash` for setting up a logger-crash handling proc (via #21) (@solnic)
+- Handle logger crashes by default using a simple `$stdout` logger (via #21) (@solnic)
 
 ### Changed
 
