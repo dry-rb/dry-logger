@@ -270,6 +270,12 @@ module Dry
       end
 
       # @since 1.0.0
+      # @api public
+      def inspect
+        %(#<#{self.class} id=#{id} options=#{options} backends=#{backends}>)
+      end
+
+      # @since 1.0.0
       # @api private
       def each_backend(&block)
         mutex.synchronize do

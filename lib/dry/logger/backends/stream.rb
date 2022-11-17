@@ -32,6 +32,12 @@ module Dry
         end
 
         # @since 1.0.0
+        # @api public
+        def inspect
+          %(#<#{self.class} stream=#{stream} level=#{level} log_if=#{log_if}>)
+        end
+
+        # @since 1.0.0
         # @api private
         def log?(entry)
           if log_if
