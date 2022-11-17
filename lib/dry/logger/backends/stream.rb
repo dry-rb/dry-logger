@@ -36,16 +36,6 @@ module Dry
         def inspect
           %(#<#{self.class} stream=#{stream} level=#{level} log_if=#{log_if}>)
         end
-
-        # @since 1.0.0
-        # @api private
-        def log?(entry)
-          if log_if
-            log_if.call(entry)
-          else
-            true
-          end
-        end
       end
     end
   end
