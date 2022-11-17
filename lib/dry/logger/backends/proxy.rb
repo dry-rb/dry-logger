@@ -20,7 +20,23 @@ module Dry
         attr_accessor :log_if
 
         LOG_METHODS.each do |method|
-          define_method(method) { |entry| __getobj__.public_send(method, entry.message) }
+          define_method(method) do |entry|
+            if entry.exception?
+              if __supports_payload__?(method)
+                __getobj__.public_send(method, entry.exception, **entry.payload.except(:exception))
+              else
+                __getobj__.public_send(method, entry.exception)
+              end
+            elsif __supports_payload__?(method)
+              if entry.message
+                __getobj__.public_send(method, entry.message, **entry.payload)
+              else
+                __getobj__.public_send(method, **entry.payload)
+              end
+            else
+              __getobj__.public_send(method, entry.message)
+            end
+          end
         end
 
         # @since 1.0.0
@@ -31,6 +47,21 @@ module Dry
           else
             true
           end
+        end
+
+        private
+
+        # @since 1.0.0
+        # @api private
+        def __supports_payload__?(method)
+          __supported_methods__[method] ||= __getobj__.method(method)
+            .parameters.last&.first.equal?(:keyrest)
+        end
+
+        # @since 1.0.0
+        # @api private
+        def __supported_methods__
+          @__supported_methods__ ||= {}
         end
       end
     end
