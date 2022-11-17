@@ -15,10 +15,6 @@ module Dry
       class Proxy < SimpleDelegator
         include Core
 
-        # @since 0.1.0
-        # @api public
-        attr_accessor :log_if
-
         LOG_METHODS.each do |method|
           define_method(method) do |entry|
             if entry.exception?

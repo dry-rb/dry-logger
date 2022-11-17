@@ -84,4 +84,18 @@ RSpec.describe Dry::Logger::Backends::Proxy do
 
     expect(output).to eql("Oops {:test=>true}")
   end
+
+  it "supports shortcut log_if" do
+    backend = test_backend do
+      def error(message)
+        @stream.write(message)
+      end
+    end
+
+    logger = Dry.Logger(:test) { |s| s.add_backend(backend, log_if: :error?) }
+
+    logger.error("Hello World")
+
+    expect(output).to eql("Hello World")
+  end
 end
