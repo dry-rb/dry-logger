@@ -1,5 +1,6 @@
 ---
 - version: 1.0.0
+  date: 2022-11-17
   summary: |
     This is a port of the original Hanami logger from hanami-utils extended with support for logging
     dispatchers that can log to different destinations and plenty more.
