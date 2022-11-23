@@ -3,7 +3,7 @@
 ## 1.0.1 2022-11-23
 
 
-### Added
+### Fixed
 
 - Support for `log_if` in proxied loggers (via 81115320b490034ddf9dfe4f3775322b9271e0cd) (@solnic)
 - Support exceptions and payloads in proxied loggers (via 93b3fd59ebbdc7e63620eb064694d58455df831f) (@solnic)
