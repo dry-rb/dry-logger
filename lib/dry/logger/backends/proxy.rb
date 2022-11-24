@@ -35,6 +35,14 @@ module Dry
           end
         end
 
+        # @since 1.0.2
+        # @api private
+        def initialize(backend, **options)
+          super(backend)
+          @options = options
+          self.log_if = @options[:log_if]
+        end
+
         # @since 1.0.0
         # @api private
         def log?(entry)

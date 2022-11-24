@@ -260,7 +260,7 @@ module Dry
         backend =
           case (instance ||= Dry::Logger.new(**options, **backend_options))
           when Backends::Stream then instance
-          else Backends::Proxy.new(instance)
+          else Backends::Proxy.new(instance, **options, **backend_options)
           end
 
         yield(backend) if block_given?
