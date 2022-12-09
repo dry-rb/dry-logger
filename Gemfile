@@ -8,8 +8,6 @@ gemspec
 
 gem "dry-core", github: "dry-rb/dry-core", branch: "main"
 
-gem "pry-byebug", platform: :mri
-
 group :test do
   gem "sequel"
   gem "sqlite3"
