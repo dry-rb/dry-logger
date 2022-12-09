@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+if RUBY_VERSION < "3"
+  require "backports/3.0.0/hash/except"
+end
+
 require "dry/logger/global"
 require "dry/logger/constants"
 require "dry/logger/clock"
