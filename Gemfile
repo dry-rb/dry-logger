@@ -8,6 +8,10 @@ gemspec
 
 gem "dry-core", github: "dry-rb/dry-core", branch: "main"
 
+if RUBY_VERSION < "3"
+  gem "backports"
+end
+
 group :test do
   gem "sequel"
   gem "sqlite3"
