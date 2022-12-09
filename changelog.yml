@@ -1,19 +1,18 @@
 ---
-- version: unreleased
-  summary: 
-  date: 
-  fixed: 
+- version: 1.0.3
+  summary:
+  date: 2022-12-09
+  fixed:
   added:
-  - 'Support for ruby 2.7 (needs backports gem that *you* need to add to your Gemfile)
-    (via #24) (@solnic)'
-  changed: 
+  - 'Support for ruby 2.7 (needs backports gem that *you* need to add to your Gemfile) (via #24) (@solnic)'
+  changed:
 - version: 1.0.2
-  summary: 
+  summary:
   date: 2022-11-24
   fixed:
   - 'Handle `:log_if` in Proxy constructors (via #23) (@solnic)'
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 1.0.1
   date: 2022-11-23
   fixed:
@@ -26,7 +25,7 @@
   summary: |
     This is a port of the original Hanami logger from hanami-utils extended with support for logging
     dispatchers that can log to different destinations and plenty more.
-  fixed: 
+  fixed:
   added:
   - 'Support arbitrary logging backends through proxy (via #12) (@solnic)'
   - 'Support for conditional logging when using arbitrary logging backends (via #13)
