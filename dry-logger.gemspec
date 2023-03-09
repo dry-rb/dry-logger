@@ -8,8 +8,8 @@ require "dry/logger/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "dry-logger"
-  spec.authors       = ["Luca Guidi"]
-  spec.email         = ["me@lucaguidi.com"]
+  spec.authors       = ["Luca Guidi", "Peter Solnica"]
+  spec.email         = ["me@lucaguidi.com", "peter@solnica.online"]
   spec.license       = "MIT"
   spec.version       = Dry::Logger::VERSION.dup
 
@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.metadata["source_code_uri"]   = "https://github.com/dry-rb/dry-logger"
   spec.metadata["bug_tracker_uri"]   = "https://github.com/dry-rb/dry-logger/issues"
 
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 2.7.0"
 
   # to update dependencies edit project.yml
 
