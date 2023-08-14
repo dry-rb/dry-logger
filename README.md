@@ -2,7 +2,7 @@
 [gem]: https://rubygems.org/gems/dry-logger
 [actions]: https://github.com/dry-rb/dry-logger/actions
 
-# dry-logger [![Gem Version](https://badge.fury.io/rb/dry-logger.svg)][gem] [![CI Status](https://github.com/dry-rb/dry-logger/workflows/ci/badge.svg)][actions]
+# dry-logger [![Gem Version](https://badge.fury.io/rb/dry-logger.svg)][gem] [![CI Status](https://github.com/dry-rb/dry-logger/workflows/CI/badge.svg)][actions]
 
 ## Links
 
