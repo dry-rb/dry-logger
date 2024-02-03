@@ -59,7 +59,7 @@ constructor:
 
 ```ruby
 logger = Dry.Logger(:test) do |dispatcher|
-  dispatcher.add_backend(stream: "logs/test.log")
+  dispatcher.add_backend(stream: "logs/test.log", template: :details)
 end
 
 # This goes to logs/test.log
