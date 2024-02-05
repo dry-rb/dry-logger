@@ -52,6 +52,21 @@ logger.info "Hello World"
 # [test] [INFO] [2022-11-17 11:46:12 +0100] Hello World
 ```
 
+### Skipping default behaviour
+
+If you don't want to log to the default `$stdout` you can skip it by passing in a block to the
+constructor:
+
+```ruby
+logger = Dry.Logger(:test) do |dispatcher|
+  dispatcher.add_backend(stream: "logs/test.log", template: :details)
+end
+
+# This goes to logs/test.log
+logger.info "Hello World"
+# [test] [INFO] [2022-11-17 11:46:12 +0100] Hello World
+```
+
 ### Conditional logging
 
 You can tell your backends when exactly they should be logging using `log_if` option. It can be set
