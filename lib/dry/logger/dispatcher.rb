@@ -110,8 +110,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def unknown(message = nil, **payload)
-        log(:unknown, message, **payload)
+      def unknown(message = nil, **payload, &block)
+        log(:unknown, message, **payload, &block)
       end
 
       # Log an entry with DEBUG severity
@@ -119,8 +119,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def debug(message = nil, **payload)
-        log(:debug, message, **payload)
+      def debug(message = nil, **payload, &block)
+        log(:debug, message, **payload, &block)
       end
 
       # Log an entry with INFO severity
@@ -128,8 +128,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def info(message = nil, **payload)
-        log(:info, message, **payload)
+      def info(message = nil, **payload, &block)
+        log(:info, message, **payload, &block)
       end
 
       # Log an entry with WARN severity
@@ -137,8 +137,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def warn(message = nil, **payload)
-        log(:warn, message, **payload)
+      def warn(message = nil, **payload, &block)
+        log(:warn, message, **payload, &block)
       end
 
       # Log an entry with ERROR severity
@@ -146,8 +146,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def error(message = nil, **payload)
-        log(:error, message, **payload)
+      def error(message = nil, **payload, &block)
+        log(:error, message, **payload, &block)
       end
 
       # Log an entry with FATAL severity
@@ -155,8 +155,8 @@ module Dry
       # @see Dispatcher#log
       # @api public
       # @return [true]
-      def fatal(message = nil, **payload)
-        log(:fatal, message, **payload)
+      def fatal(message = nil, **payload, &block)
+        log(:fatal, message, **payload, &block)
       end
 
       BACKEND_METHODS.each do |name|
@@ -179,6 +179,9 @@ module Dry
       # @example logging a message
       #   logger.log(:info, "Hello World")
       #
+      # @example logging a message by passing a block
+      #   logger.log(:debug, "Sidecar") { "Hello World" }
+      #
       # @example logging payload
       #   logger.log(:info, verb: "GET", path: "/users")
       #
@@ -196,17 +199,25 @@ module Dry
       # @param [Symbol] severity The log severity name
       # @param [String] message Optional message
       # @param [Hash] payload Optional log entry payload
+      # @yield
+      # @yieldreturn [String] Message to be logged
       #
       # @since 1.0.0
       # @return [true]
       # @api public
-      def log(severity, message = nil, **payload)
+      def log(severity, message = nil, **payload, &block)
         case message
-        when Hash then log(severity, nil, **message)
+        when Hash then log(severity, **message, &block)
         else
+          if block
+            progname = message
+            message = block.call
+          end
+          progname ||= id
+
           entry = Entry.new(
             clock: clock,
-            progname: id,
+            progname: progname,
             severity: severity,
             tags: @tags,
             message: message,
