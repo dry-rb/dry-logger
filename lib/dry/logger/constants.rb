@@ -58,7 +58,7 @@ module Dry
 
     # @since 1.0.0
     # @api private
-    LEVEL_RANGE = (DEBUG..UNKNOWN).freeze
+    LEVEL_RANGE = (DEBUG..UNKNOWN)
 
     # @since 1.0.0
     # @api private

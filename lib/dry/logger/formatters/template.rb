@@ -16,7 +16,7 @@ module Dry
       class Template
         # @since 1.0.0
         # @api private
-        TOKEN_REGEXP = /%<(\w*)>s/.freeze
+        TOKEN_REGEXP = /%<(\w*)>s/
 
         # @since 1.0.0
         # @api private
