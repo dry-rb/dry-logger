@@ -5,11 +5,11 @@
 
 ### Fixed
 
-- Accept log messages via given block, ensuring compatibility with standard Ruby logger (@komidore64)
+- Accept log messages via given block, ensuring compatibility with standard Ruby logger (via #28) (@komidore64)
 
 ### Changed
 
-- Drop support for Ruby 2.7 (@timriley)
+- Drop support for Ruby 2.7 (via #29) (@timriley)
 
 [Compare v1.0.3...v1.0.4](https://github.com/dry-rb/dry-logger/compare/v1.0.3...v1.0.4)
 
