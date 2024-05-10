@@ -25,6 +25,58 @@ RSpec.describe Dry::Logger do
 
       expect(output).to match("#{message} test=true")
     end
+
+    it "logs to $stdout by default using a plain text block message" do
+      message = "hello, world"
+
+      logger.info { message }
+
+      expect(output).to match(message)
+    end
+
+    it "logs to $stdout by default using a plain text block message and payload" do
+      message = "hello, world"
+
+      logger.info(test: true) { message }
+
+      expect(output).to match("#{message} test=true")
+    end
+  end
+
+  context "using progname" do
+    subject(:logger) { Dry.Logger(:test, stream: stream, template: "%<progname>s: %<message>s %<payload>s") }
+
+    it "uses the logger ID as the progname" do
+      message = "hello, world"
+
+      logger.info(message)
+
+      expect(output).to match("test: #{message}")
+    end
+
+    it "replaces the default progname with the progname: keyword argument" do
+      message = "hello, world"
+
+      logger.info(message, progname: "newprog", test: true)
+
+      expect(output).to match("newprog: #{message} test=true")
+    end
+
+    it "replaces the progname with the first string argument when the message is given as a block" do
+      message = "hello, world"
+
+      logger.info("newprog") { message }
+
+      expect(output).to match("newprog: hello, world")
+    end
+
+    it "replaces the progname with the progname: keyword argument when the message is given as a block" do
+      message = "hello, world"
+
+      logger.info(progname: "newprog", test: true) { message }
+
+      expect(output).to match("newprog: #{message} test=true")
+    end
   end
 
   context "adding backends via block only" do

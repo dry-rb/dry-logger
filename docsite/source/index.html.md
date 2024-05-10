@@ -37,6 +37,9 @@ logger = Dry.Logger(:test, template: :details)
 
 logger.info "Hello World"
 # [test] [INFO] [2022-11-17 11:43:52 +0100] Hello World
+
+logger.info { "Hello World from a block" }
+# [test] [INFO] [2022-11-17 11:44:12 +0100] Hello World from a block
 ```
 
 ### Using multiple logging destinations
