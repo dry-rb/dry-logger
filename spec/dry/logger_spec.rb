@@ -166,9 +166,20 @@ RSpec.describe Dry::Logger do
       end
     end
 
-    context "log rotation" do
+    context "log-file rotation" do
       let(:stream) { random_file_name(tmp: TMP) }
-      let(:file_path_without_ext) { "#{File.dirname(stream)}/#{File.basename(stream, File.extname(stream))}" }
+      let(:file_path_without_ext) { File.join(File.dirname(stream), File.basename(stream, ".*")) }
+
+      context "default" do
+        subject(:logger) { Dry.Logger(:test, stream: stream) }
+
+        it "does not rotate logs by default" do
+          2000.times { logger.info("Hello log message!") }
+
+          expect(File).to exist("#{file_path_without_ext}.log")
+          expect(File).to_not exist("#{file_path_without_ext}.log.1")
+        end
+      end
   
       context "based on size" do
         subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: 3, shift_size: 10_000) }
@@ -176,10 +187,14 @@ RSpec.describe Dry::Logger do
         it "rotates logs based on shift_age and shift_size" do
           2000.times { logger.info("Hello log message!") }
   
-          expect(File.exist?("#{file_path_without_ext}.log")).to be true
-          expect(File.exist?("#{file_path_without_ext}.log.0")).to be true
-          expect(File.exist?("#{file_path_without_ext}.log.1")).to be true
-          expect(File.exist?("#{file_path_without_ext}.log.2")).to be false
+          [true, true, false].each_with_index do |should_exist, i|
+            suffix = i.zero? ? "" : ".#{i}"
+            if should_exist
+              expect(File).to exist("#{file_path_without_ext}.log#{suffix}")
+            else
+              expect(File).to_not exist("#{file_path_without_ext}.log#{suffix}")
+            end
+          end
         end
       end
   
@@ -192,12 +207,12 @@ RSpec.describe Dry::Logger do
           allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-16 16:00:23 +0100").to_time)
           logger.info("Hello log message!")
   
-          expect(File.exist?("#{file_path_without_ext}.log")).to be true
-          expect(File.exist?("#{file_path_without_ext}.log.20250415")).to be true
+          expect(File).to exist("#{file_path_without_ext}.log")
+          expect(File).to exist("#{file_path_without_ext}.log.20250415")
         end
   
         context "with custom suffix" do
-          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "%m") }
+          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "month_%m") }
   
           it "rotates logs based on period" do
             allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-15 16:00:23 +0100").to_time)
@@ -205,8 +220,8 @@ RSpec.describe Dry::Logger do
             allow(Time).to receive(:now).and_return(DateTime.parse("2025-05-01 16:00:23 +0100").to_time)
             logger.info("Hello log message!")
   
-            expect(File.exist?("#{file_path_without_ext}.log")).to be true
-            expect(File.exist?("#{file_path_without_ext}.log.04")).to be true
+            expect(File).to exist("#{file_path_without_ext}.log")
+            expect(File).to exist("#{file_path_without_ext}.log.month_04")
           end
         end
       end

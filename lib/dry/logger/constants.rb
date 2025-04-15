@@ -82,11 +82,11 @@ module Dry
 
     # @since 1.0.0
     # @api private
-    DEFAULT_OPTS = {level: DEFAULT_LEVEL, formatter: nil, progname: nil, log_if: nil}.freeze
+    DEFAULT_OPTS = {level: DEFAULT_LEVEL, formatter: nil, progname: nil, log_if: nil, shift_age: nil, shift_size: nil, shift_period_suffix: nil}.freeze
 
     # @since 1.0.0
     # @api private
-    BACKEND_OPT_KEYS = (DEFAULT_OPTS.keys + [:shift_age, :shift_size, :shift_period_suffix]).freeze
+    BACKEND_OPT_KEYS = (DEFAULT_OPTS.keys).freeze
 
     # @since 1.0.0
     # @api private

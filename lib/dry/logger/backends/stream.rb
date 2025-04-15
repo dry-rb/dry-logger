@@ -11,6 +11,10 @@ module Dry
       class Stream < ::Logger
         include Core
 
+        DEFAULT_SHIFT_AGE = 0
+        DEFAULT_SHIFT_SIZE = 1 * 1024 * 1024
+        DEFAULT_SHIFT_SUFFIX = "%Y%m%d"
+
         # @since 0.1.0
         # @api private
         attr_reader :stream
@@ -21,8 +25,25 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, formatter:, level: DEFAULT_LEVEL, progname: nil, log_if: nil, shift_age: 0, shift_size: 1048576, **options)
-          super(stream, shift_age, shift_size, progname: progname, **options)
+        def initialize(
+          stream:,
+          formatter:,
+          level: DEFAULT_LEVEL,
+          progname: nil,
+          log_if: nil,
+          shift_age: nil,
+          shift_size: nil,
+          shift_period_suffix: nil,
+          **logger_options
+        )
+          super(
+            stream,
+            shift_age || DEFAULT_SHIFT_AGE,
+            shift_size || DEFAULT_SHIFT_SIZE,
+            shift_period_suffix: shift_period_suffix || DEFAULT_SHIFT_SUFFIX,
+            progname: progname,
+            **logger_options
+          )
 
           @stream = stream
           @level = LEVELS[level]
