@@ -21,8 +21,8 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, formatter:, level: DEFAULT_LEVEL, progname: nil, log_if: nil)
-          super(stream, progname: progname)
+        def initialize(stream:, formatter:, level: DEFAULT_LEVEL, progname: nil, log_if: nil, shift_age: 0, shift_size: 1048576, **options)
+          super(stream, shift_age, shift_size, progname: progname, **options)
 
           @stream = stream
           @level = LEVELS[level]

@@ -165,6 +165,52 @@ RSpec.describe Dry::Logger do
         expect(stream).to be_exist
       end
     end
+
+    context "log rotation" do
+      let(:stream) { random_file_name(tmp: TMP) }
+      let(:file_path_without_ext) { "#{File.dirname(stream)}/#{File.basename(stream, File.extname(stream))}" }
+  
+      context "based on size" do
+        subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: 3, shift_size: 10_000) }
+  
+        it "rotates logs based on shift_age and shift_size" do
+          2000.times { logger.info("Hello log message!") }
+  
+          expect(File.exist?("#{file_path_without_ext}.log")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.0")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.1")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.2")).to be false
+        end
+      end
+  
+      context "based on period" do
+        subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "daily") }
+  
+        it "rotates logs based on period" do
+          allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-15 16:00:23 +0100").to_time)
+          logger.info("Hello log message!")
+          allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-16 16:00:23 +0100").to_time)
+          logger.info("Hello log message!")
+  
+          expect(File.exist?("#{file_path_without_ext}.log")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.20250415")).to be true
+        end
+  
+        context "with custom suffix" do
+          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "%m") }
+  
+          it "rotates logs based on period" do
+            allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-15 16:00:23 +0100").to_time)
+            logger.info("Hello log message!")
+            allow(Time).to receive(:now).and_return(DateTime.parse("2025-05-01 16:00:23 +0100").to_time)
+            logger.info("Hello log message!")
+  
+            expect(File.exist?("#{file_path_without_ext}.log")).to be true
+            expect(File.exist?("#{file_path_without_ext}.log.04")).to be true
+          end
+        end
+      end
+    end
   end
 
   context "when IO" do

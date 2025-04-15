@@ -86,7 +86,7 @@ module Dry
 
     # @since 1.0.0
     # @api private
-    BACKEND_OPT_KEYS = DEFAULT_OPTS.keys.freeze
+    BACKEND_OPT_KEYS = (DEFAULT_OPTS.keys + [:shift_age, :shift_size, :shift_period_suffix]).freeze
 
     # @since 1.0.0
     # @api private
