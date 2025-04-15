@@ -86,7 +86,7 @@ module Dry
 
     # @since 1.0.0
     # @api private
-    BACKEND_OPT_KEYS = (DEFAULT_OPTS.keys).freeze
+    BACKEND_OPT_KEYS = DEFAULT_OPTS.keys.freeze
 
     # @since 1.0.0
     # @api private
