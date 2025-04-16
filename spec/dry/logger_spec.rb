@@ -165,6 +165,67 @@ RSpec.describe Dry::Logger do
         expect(stream).to be_exist
       end
     end
+
+    context "log-file rotation" do
+      let(:stream) { random_file_name(tmp: TMP) }
+      let(:file_path_without_ext) { File.join(File.dirname(stream), File.basename(stream, ".*")) }
+
+      context "default" do
+        subject(:logger) { Dry.Logger(:test, stream: stream) }
+
+        it "does not rotate logs by default" do
+          2000.times { logger.info("Hello log message!") }
+
+          expect(File.exist?("#{file_path_without_ext}.log")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.1")).to be false
+        end
+      end
+
+      context "based on size" do
+        subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: 3, shift_size: 10_000) }
+
+        it "rotates logs based on shift_age and shift_size" do
+          2000.times { logger.info("Hello log message!") }
+
+          expect(File.exist?("#{file_path_without_ext}.log")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.1")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.2")).to be false
+        end
+      end
+
+      context "based on period" do
+        let(:now) { Time.parse("2025-06-06 07:07:23 +0100") }
+        subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "daily") }
+
+        before do
+          # Ruby's logger reads the timestamp from the file for the base-time.
+          # That's why we need to mock the mtime of the file with the spec's now.
+          allow_any_instance_of(File::Stat).to receive(:mtime).and_return(now)
+        end
+
+        it "rotates logs based on period" do
+          logger.info("Hello log message!")
+          allow(Time).to receive(:now).and_return(now + (60 * 60 * 24))
+          logger.info("Hello log message!")
+
+          expect(File.exist?("#{file_path_without_ext}.log")).to be true
+          expect(File.exist?("#{file_path_without_ext}.log.20250606")).to be true
+        end
+
+        context "with custom suffix" do
+          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "month%m") }
+
+          it "rotates logs based on period" do
+            logger.info("Hello log message!")
+            allow(Time).to receive(:now).and_return(now + (60 * 60 * 24 * 30))
+            logger.info("Hello log message!")
+
+            expect(File.exist?("#{file_path_without_ext}.log")).to be true
+            expect(File.exist?("#{file_path_without_ext}.log.month06")).to be true
+          end
+        end
+      end
+    end
   end
 
   context "when IO" do

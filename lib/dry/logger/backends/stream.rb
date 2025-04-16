@@ -21,8 +21,23 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize(stream:, formatter:, level: DEFAULT_LEVEL, progname: nil, log_if: nil)
-          super(stream, progname: progname)
+        def initialize( # rubocop:disable Style/ParameterLists
+          stream:,
+          formatter:,
+          level: DEFAULT_LEVEL,
+          progname: nil,
+          log_if: nil,
+          shift_age: nil,
+          shift_size: nil,
+          **logger_options
+        )
+          super(
+            stream,
+            shift_age,
+            shift_size,
+            progname: progname,
+            **logger_options
+          )
 
           @stream = stream
           @level = LEVELS[level]
