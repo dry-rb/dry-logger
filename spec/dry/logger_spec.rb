@@ -199,29 +199,34 @@ RSpec.describe Dry::Logger do
       end
   
       context "based on period" do
+        let(:now) { Time.parse("2025-06-06 07:07:23 +0100") }
         subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "daily") }
-  
-        it "rotates logs based on period" do
-          allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-15 16:00:23 +0100").to_time)
-          logger.info("Hello log message!")
-          allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-16 16:00:23 +0100").to_time)
-          logger.info("Hello log message!")
-  
-          expect(File).to exist("#{file_path_without_ext}.log")
-          expect(File).to exist("#{file_path_without_ext}.log.20250415")
+    
+        before do
+          # Ruby's logger reads the timestamp from the file for the base-time.
+          # That's why we need to mock the mtime of the file with the spec's now.
+          allow_any_instance_of(File::Stat).to receive(:mtime).and_return(now)
         end
-  
+    
+        it "rotates logs based on period" do
+          logger.info("Hello log message!")
+          allow(Time).to receive(:now).and_return(now + (60 * 60 * 24))
+          logger.info("Hello log message!")
+    
+          expect(File).to exist("#{file_path_without_ext}.log")
+          expect(File).to exist("#{file_path_without_ext}.log.20250606")
+        end
+    
         context "with custom suffix" do
-          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "month_%m") }
-  
+          subject(:logger) { Dry.Logger(:test, stream: stream, shift_age: "monthly", shift_period_suffix: "month%m") }
+    
           it "rotates logs based on period" do
-            allow(Time).to receive(:now).and_return(DateTime.parse("2025-04-15 16:00:23 +0100").to_time)
             logger.info("Hello log message!")
-            allow(Time).to receive(:now).and_return(DateTime.parse("2025-05-01 16:00:23 +0100").to_time)
+            allow(Time).to receive(:now).and_return(now + (60 * 60 * 24 * 30))
             logger.info("Hello log message!")
-  
+    
             expect(File).to exist("#{file_path_without_ext}.log")
-            expect(File).to exist("#{file_path_without_ext}.log.month_04")
+            expect(File).to exist("#{file_path_without_ext}.log.month06")
           end
         end
       end
