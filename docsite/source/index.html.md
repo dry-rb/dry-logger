@@ -158,3 +158,27 @@ logger = Dry.Logger(:test, formatter: :rack)
 logger.info verb: "GET", path: "/users", elapsed: "12ms", ip: "127.0.0.1", status: 200, length: 312, params: {}
 # [test] [INFO] [2022-11-17 12:04:30 +0100] GET 200 12ms 127.0.0.1 /users 312
 ```
+
+### Configuring log rotation
+
+You can use the Ruby Logger's [log rotation support](https://rubyapi.org/o/logger#class-Logger-label-Log+File+Rotation) for any stream-based logger backend.
+
+To rotate log files based on size, provide:
+
+- `shift_age:` as a positive integer: the number of log files to be in the rotation.
+- `shift_size:` as a positive integer: the maximum size (in bytes) of each log file; defaults to 1048576 (1 megabyte).
+
+```ruby
+# Five 10-megabyte files.
+logger = Dry.logger(:test, stream: "logs/test.log", shift_age: 5, shift_size: 10485760)
+```
+
+To rotate log files based on age, provide:
+
+- `shift_age:` as a string period indicator (`"daily"`, `"weekly"`, `"monthly"`)
+
+```ruby
+logger = Dry.logger(:test, stream: "logs/test.log", shift_age: "daily")
+```
+
+See the [Ruby Logger documentation]((https://rubyapi.org/o/logger#class-Logger-label-Log+File+Rotation)) for more detail on its log rotation support.
