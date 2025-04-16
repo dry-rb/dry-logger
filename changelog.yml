@@ -1,4 +1,9 @@
 ---
+- version: 1.1.0
+  date: 2025-04-17
+- added:
+    - |
+      Support `::Logger`'s log rotation in stream-based logger backends, via `shift_size:` and `shift_age:` arguments (@wuarmin in #31)
 - version: 1.0.4
   date: 2024-05-10
   fixed:
