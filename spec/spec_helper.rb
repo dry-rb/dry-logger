@@ -18,7 +18,7 @@ FileUtils.mkdir_p(RELATIVE_TMP)
 
 TMP = SPEC_ROOT.join("..", RELATIVE_TMP).realpath
 
-require_relative "support/rspec_options"
+require_relative "support/rspec"
 
 require "dry/logger"
 
