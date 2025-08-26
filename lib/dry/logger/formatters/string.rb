@@ -140,7 +140,7 @@ module Dry
         def severity_colors
           @severity_colors ||= DEFAULT_SEVERITY_COLORS.merge(
             (options[:severity_colors] || EMPTY_HASH)
-              .to_h { |key, value| [LEVELS[key.to_s], value] }
+              .transform_keys { |key| LEVELS[key.to_s] }
           )
         end
       end

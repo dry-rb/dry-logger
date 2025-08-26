@@ -226,14 +226,14 @@ module Dry
 
           each_backend do |backend|
             backend.__send__(severity, entry) if backend.log?(entry)
-          rescue StandardError => e
-            on_crash.(progname: id, exception: e, message: message, payload: payload)
+          rescue StandardError => exception
+            on_crash.(progname: id, exception: exception, message: message, payload: payload)
           end
         end
 
         true
-      rescue StandardError => e
-        on_crash.(progname: id, exception: e, message: message, payload: payload)
+      rescue StandardError => exception
+        on_crash.(progname: id, exception: exception, message: message, payload: payload)
         true
       end
 

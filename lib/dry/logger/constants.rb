@@ -6,7 +6,7 @@ module Dry
   module Logger
     # @since 1.0.0
     # @api private
-    NEW_LINE = $/ # rubocop:disable Style/SpecialGlobalVars
+    NEW_LINE = $/
 
     # @since 1.0.0
     # @api private
