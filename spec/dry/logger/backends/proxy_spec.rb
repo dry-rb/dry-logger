@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+using RSpec::Support::HashString
+
 RSpec.describe Dry::Logger::Backends::Proxy do
   include_context "stream"
 
@@ -46,7 +48,7 @@ RSpec.describe Dry::Logger::Backends::Proxy do
   it "forwards payload" do
     backend = test_backend do
       def info(**payload)
-        @stream.write(payload)
+        @stream.write(payload.to_s)
       end
     end
 
