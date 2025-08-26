@@ -97,7 +97,7 @@ module Dry
         def format_exception(value)
           [
             "#{value.message} (#{value.class})",
-            format_backtrace(value.backtrace || EMPTY_BACKTRACE)
+            format_backtrace(value.backtrace || EMPTY_ARRAY)
           ].join(NEW_LINE)
         end
 
