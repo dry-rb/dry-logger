@@ -1,9 +1,0 @@
-name: dry-logger
-codacy_id: 5aae4837b97044cfa4537f083ad584e9
-rubies: ["3.2", "3.1", "3.0", "2.7"]
-gemspec:
-  authors: ["Luca Guidi", "Peter Solnica"]
-  email: ["me@lucaguidi.com", "peter@solnica.online"]
-  summary: "Logging for Ruby"
-  development_dependencies:
-    - rspec
