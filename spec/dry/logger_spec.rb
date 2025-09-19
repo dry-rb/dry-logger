@@ -41,6 +41,10 @@ RSpec.describe Dry::Logger do
 
       expect(output).to match("#{message} test=true")
     end
+
+    it "does not execute the block if severity is higher" do
+      logger.debug { raise }
+    end
   end
 
   context "using progname" do
