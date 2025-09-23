@@ -35,9 +35,7 @@ RSpec.describe Dry::Logger do
     end
 
     it "logs to $stdout by default using a payload block" do
-      message = "hello, world"
-
-      logger.info { { test: true } }
+      logger.info { {test: true} }
 
       expect(output).to match("test=true")
     end
@@ -53,11 +51,10 @@ RSpec.describe Dry::Logger do
     it "logs to $stdout by default using a plain text message and payload block" do
       message = "hello, world"
 
-      logger.info(message) { { test: true } }
+      logger.info(message) { {test: true} }
 
       expect(output).to match("#{message} test=true")
     end
-
   end
 
   context "using progname" do
