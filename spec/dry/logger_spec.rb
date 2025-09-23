@@ -34,10 +34,24 @@ RSpec.describe Dry::Logger do
       expect(output).to match(message)
     end
 
+    it "logs to $stdout by default using a payload block" do
+      logger.info { {test: true} }
+
+      expect(output).to match("test=true")
+    end
+
     it "logs to $stdout by default using a plain text block message and payload" do
       message = "hello, world"
 
       logger.info(test: true) { message }
+
+      expect(output).to match("#{message} test=true")
+    end
+
+    it "logs to $stdout by default using a plain text message and payload block" do
+      message = "hello, world"
+
+      logger.info(message) { {test: true} }
 
       expect(output).to match("#{message} test=true")
     end
