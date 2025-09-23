@@ -47,7 +47,7 @@ RSpec.describe Dry::Logger do
 
       expect(output).to match("#{message} test=true")
     end
-    
+
     it "logs to $stdout by default using a plain text message and payload block" do
       message = "hello, world"
 
@@ -57,7 +57,7 @@ RSpec.describe Dry::Logger do
     end
 
     it "does not execute the block if severity is higher" do
-      logger.debug { raise }      
+      logger.debug { raise }
     end
   end
 

@@ -205,7 +205,7 @@ module Dry
       # @since 1.0.0
       # @return [true]
       # @api public
-      def log(severity, message = nil, **payload, &block)
+      def log(severity, message = nil, **payload, &block) # rubocop:disable Metrics/PerceivedComplexity
         return true if LEVELS[severity] < level
 
         case message
