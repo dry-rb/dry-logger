@@ -213,7 +213,12 @@ module Dry
         else
           if block
             progname = message
-            message = block.call
+            block_result = block.call
+            case block_result
+            when Hash then payload = block_result
+            else
+              message = block_result
+            end
           end
           progname ||= id
 
