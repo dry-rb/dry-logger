@@ -207,6 +207,7 @@ module Dry
       # @api public
       def log(severity, message = nil, **payload, &block)
         return true if LEVELS[severity] < level
+
         case message
         when Hash then log(severity, **message, &block)
         else
