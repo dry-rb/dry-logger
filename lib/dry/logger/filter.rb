@@ -5,16 +5,13 @@ module Dry
     # Filtering logic
     # Originaly copied from hanami/utils (see Hanami::Logger)
     #
-    # @since 0.1.0
     # @api private
     class Filter
-      # @since 0.1.0
       # @api private
       def initialize(filters = [])
         @filters = filters
       end
 
-      # @since 0.1.0
       # @api private
       def call(hash)
         _filtered_keys(hash).each do |key|
@@ -27,12 +24,8 @@ module Dry
 
       private
 
-      # @since 0.1.0
-      # @api private
       attr_reader :filters
 
-      # @since 0.1.0
-      # @api private
       def _filtered_keys(hash)
         _key_paths(hash).select { |key|
           filters.any? { |filter|
@@ -41,22 +34,16 @@ module Dry
         }
       end
 
-      # @since 0.1.0
-      # @api private
       def _key_paths(hash, base = nil)
         hash.inject([]) do |results, (k, v)|
           results + (_key_paths?(v) ? _key_paths(v, _build_path(base, k)) : [_build_path(base, k)])
         end
       end
 
-      # @since 0.1.0
-      # @api private
       def _build_path(base, key)
         [base, key.to_s].compact.join(".")
       end
 
-      # @since 0.1.0
-      # @api private
       def _actual_keys(hash, keys)
         search_in = hash
 
@@ -69,9 +56,6 @@ module Dry
 
       # Check if the given value can be iterated (`Enumerable`) and that isn't a `File`.
       # This is useful to detect closed `Tempfiles`.
-      #
-      # @since 0.1.0
-      # @api private
       #
       # @see https://github.com/hanami/utils/pull/342
       def _key_paths?(value)
