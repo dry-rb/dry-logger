@@ -345,4 +345,17 @@ RSpec.describe Dry::Logger do
       expect(output).to eq "foo\n"
     end
   end
+
+  describe "with filters" do
+    it "does not mutate the original payload hash" do
+      logger = Dry.Logger(:test, stream:, filters: %w[password token])
+
+      data = {password: "secret", token: "abc123", user: "john"}
+      original_data = data.dup
+
+      logger.info("Login attempt", **data)
+
+      expect(data).to eq(original_data)
+    end
+  end
 end
