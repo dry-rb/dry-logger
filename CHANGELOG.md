@@ -7,12 +7,28 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
 ## [1.2.0] - 2025-11-05
 
 ### Changed
 
 - When a block is given when logging, do not execute the block if the severity is lower than the configured logger level. (@p8 in #33)
 - When a block is given when logging, and that block returns a hash, use that hash as the log payload. (@p8 in #34)
+
+### Fixed
+
+- When filtering logged data, filter on a copy of the given hash, rather then mutating it directly. (@timriley in #35)
 
 ## [1.1.0] - 2025-04-17
 
