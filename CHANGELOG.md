@@ -13,10 +13,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 - Support `::Logger`'s log rotation in stream-based logger backends, via `shift_size:` and `shift_age:` arguments (@wuarmin in #31)
 
-[Compare v1.0.4...v1.1.0](https://github.com/dry-rb/dry-logger/compare/v1.0.4...v1.1.0)
-
 ## [1.0.4] - 2024-05-10
-
 
 ### Fixed
 
@@ -26,44 +23,29 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 - Drop support for Ruby 2.7 (via #29) (@timriley)
 
-[Compare v1.0.3...v1.0.4](https://github.com/dry-rb/dry-logger/compare/v1.0.3...v1.0.4)
-
 ## [1.0.3] - 2022-12-09
-
 
 ### Added
 
 - Support for ruby 2.7 (needs backports gem that *you* need to add to your Gemfile) (via #24) (@solnic)
 
-
-[Compare v1.0.2...v1.0.3](https://github.com/dry-rb/dry-logger/compare/v1.0.2...v1.0.3)
-
 ## [1.0.2] - 2022-11-24
-
 
 ### Fixed
 
 - Handle `:log_if` in Proxy constructors (via #23) (@solnic)
 
-
-[Compare v1.0.1...v1.0.2](https://github.com/dry-rb/dry-logger/compare/v1.0.1...v1.0.2)
-
 ## [1.0.1] - 2022-11-23
-
 
 ### Fixed
 
 - Support for `log_if` in proxied loggers (via 81115320b490034ddf9dfe4f3775322b9271e0cd) (@solnic)
 - Support exceptions and payloads in proxied loggers (via 93b3fd59ebbdc7e63620eb064694d58455df831f) (@solnic)
 
-
-[Compare v1.0.0...v1.0.1](https://github.com/dry-rb/dry-logger/compare/v1.0.0...v1.0.1)
-
 ## [1.0.0] - 2022-11-17
 
 This is a port of the original Hanami logger from hanami-utils extended with support for logging
 dispatchers that can log to different destinations and plenty more.
-
 
 ### Added
 
@@ -85,3 +67,10 @@ dispatchers that can log to different destinations and plenty more.
 - `:rack` string log formatter which inlines request info and displays params at the end (@solnic)
 - Conditional log dispatch via `#log_if` backend's predicate (via #9) (@solnic)
 - Add support for shared context and tagged log entries (via #10) (@solnic)
+
+[1.1.0]: https://github.com/dry-rb/dry-logger/compare/v1.0.4...v1.1.0
+[1.0.4]: https://github.com/dry-rb/dry-logger/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/dry-rb/dry-logger/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/dry-rb/dry-logger/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/dry-rb/dry-logger/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/dry-rb/dry-logger/releases/tag/v1.0.0
