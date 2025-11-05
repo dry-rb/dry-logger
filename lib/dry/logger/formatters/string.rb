@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 require_relative "template"
 require_relative "structured"
 
