@@ -7,6 +7,13 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-11-05
+
+### Changed
+
+- When a block is given when logging, do not execute the block if the severity is lower than the configured logger level. (@p8 in #33)
+- When a block is given when logging, and that block returns a hash, use that hash as the log payload. (@p8 in #34)
+
 ## [1.1.0] - 2025-04-17
 
 ### Added
@@ -68,6 +75,7 @@ dispatchers that can log to different destinations and plenty more.
 - Conditional log dispatch via `#log_if` backend's predicate (via #9) (@solnic)
 - Add support for shared context and tagged log entries (via #10) (@solnic)
 
+[1.2.0]: https://github.com/dry-rb/dry-logger/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dry-rb/dry-logger/compare/v1.0.4...v1.1.0
 [1.0.4]: https://github.com/dry-rb/dry-logger/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/dry-rb/dry-logger/compare/v1.0.2...v1.0.3
