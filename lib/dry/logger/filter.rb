@@ -14,6 +14,8 @@ module Dry
 
       # @api private
       def call(hash)
+        hash = _deep_dup(hash)
+
         _filtered_keys(hash).each do |key|
           *keys, last = _actual_keys(hash, key.split("."))
           keys.inject(hash, :fetch)[last] = "[FILTERED]"
@@ -60,6 +62,13 @@ module Dry
       # @see https://github.com/hanami/utils/pull/342
       def _key_paths?(value)
         value.is_a?(Enumerable) && !value.is_a?(File)
+      end
+
+      # Returns a deeply duplicated hash to avoid mutations of the original.
+      def _deep_dup(hash)
+        hash.transform_values { |value|
+          value.is_a?(Hash) ? _deep_dup(value) : value
+        }
       end
     end
   end
