@@ -1,98 +1,225 @@
 ---
 title: Introduction
+description: Standalone, structured logging for Ruby
 layout: gem-single
-name: dry-logger
 type: gem
+name: dry-logger
+sections:
+  - backends
+  - formatters
+  - templates
+  - filtering
+  - context
+  - tagging
+  - crash-handling
+  - testing
+  - examples
 ---
 
-dry-logger provides a standalone, dependency-free logging solution suitable for any Ruby application.
+dry-logger is a standalone, dependency-free logging solution for Ruby applications.
 
-- Structured logging *by default*
-- Logging to multiple destinations via pluggable logging `backends`
-- Fine-grained log formatting using `formatters`
-- Customizable logging logic via log filtering
-- Out-of-the-box exception logging
-- Built-in support for text log templates with customizable colorized output
-- Built-in support for tagged log entries
-- Public API for adding your own `backends` and `formatters`
+## Features
 
-### Basic setup
+- **Structured logging** - First-class support for key-value payloads
+- **Multiple destinations** - Log to stdout, files, or multiple backends simultaneously
+- **Flexible formatting** - String, JSON, and Rack formatters included
+- **Data filtering** - Redact sensitive information from logs
+- **Exception handling** - Automatic formatting of exceptions with backtraces
+- **Customizable templates** - Control log format with colorization support
+- **Extensible** - Add custom backends and formatters
 
-To configure a basic `$stdout` logger simply use the main setup method `Dry.Logger`:
+## Installation
+
+Add dry-logger to your Gemfile:
+
+```ruby
+gem "dry-logger"
+```
+
+## Getting started
+
+Create a logger and start logging:
+
+```ruby
+require "dry/logger"
+
+logger = Dry.Logger(:my_app)
+
+logger.info("Application started")
+# Application started
+
+logger.warn("Low memory warning")
+# Low memory warning
+
+logger.error("Failed to connect to database")
+# Failed to connect to database
+```
+
+### Log levels
+
+Set the minimum severity level to control which messages are logged:
+
+```ruby
+logger = Dry.Logger(:my_app, level: :warn)
+
+logger.debug("Debug message")  # Won't be logged
+logger.info("Info message")    # Won't be logged
+logger.warn("Warning message") # Will be logged
+logger.error("Error message")  # Will be logged
+```
+
+Available levels (lowest to highest): `:debug`, `:info` (default), `:warn`, `:error`, `:fatal`, `:unknown`
+
+### Structured logging
+
+Attach key-value data to log entries:
 
 ```ruby
 logger = Dry.Logger(:my_app)
 
-logger.info "Hello World"
-# Hello World
+# Log with structured data
+logger.info("User logged in", user_id: 42, ip: "192.168.1.1")
+# User logged in user_id=42 ip="192.168.1.1"
+
+# Log only structured data (no message)
+logger.info(action: "signup", user_id: 123, plan: "premium")
+# action="signup" user_id=123 plan="premium"
 ```
 
-The setup method accepts various options to configure the logger. You can change default formatter,
-provide customized text templates, and so on.
+### Logging exceptions
 
-Let's use a more detailed logging template that gives more logging context in the output:
+Exceptions are automatically formatted with their message, class, and backtrace:
+
+```ruby
+begin
+  1 / 0
+rescue => e
+  logger.error(e)
+  # ZeroDivisionError: divided by 0
+  #   /path/to/file.rb:10:in `/'
+  #   /path/to/file.rb:10:in `<main>'
+end
+```
+
+### Block-based logging
+
+For expensive operations, use blocks to avoid computing messages unless they'll actually be logged:
+
+```ruby
+logger = Dry.Logger(:my_app, level: :info)
+
+# Block is NOT evaluated (debug < info)
+logger.debug { expensive_debug_info }
+
+# Block IS evaluated
+logger.info { "User count: #{User.count}" }
+# User count: 42
+```
+
+Blocks can also return structured data:
+
+```ruby
+logger.info { {action: "cache_miss", key: "user:123"} }
+# action="cache_miss" key="user:123"
+```
+
+### Customizing progname per entry
+
+Override the logger's default progname for specific log entries:
+
+```ruby
+logger = Dry.Logger(:my_app)
+
+# Use progname keyword
+logger.info("Request received", progname: "http_server", path: "/api/users")
+# Logs with progname "http_server" instead of "my_app"
+
+# Or pass as first argument with block-based logging
+logger.info("worker") { "Job completed" }
+# Logs with progname "worker"
+```
+
+## Output streams
+
+### Standard output (default)
+
+```ruby
+logger = Dry.Logger(:my_app)  # Logs to $stdout
+```
+
+### Files
+
+```ruby
+logger = Dry.Logger(:my_app, stream: "logs/application.log")  # Relative path
+logger = Dry.Logger(:my_app, stream: "/var/log/app.log")      # Absolute path
+```
+
+### StringIO (testing)
+
+```ruby
+require "stringio"
+
+output = StringIO.new
+logger = Dry.Logger(:my_app, stream: output)
+
+logger.info("Test message")
+
+puts output.string
+# Test message
+```
+
+## Multiple destinations
+
+### Using add_backend
+
+Add backends to the default logger:
 
 ```ruby
 logger = Dry.Logger(:test, template: :details)
+  .add_backend(stream: "logs/test.log")
 
 logger.info "Hello World"
-# [test] [INFO] [2022-11-17 11:43:52 +0100] Hello World
-
-logger.info { "Hello World from a block" }
-# [test] [INFO] [2022-11-17 11:44:12 +0100] Hello World from a block
-```
-
-### Using multiple logging destinations
-
-You can configure your logger to log to more than one destination. In case of the default logger,
-the destination is set to `$stdout`. Let's say you want to log both to `$stdout` and a file:
-
-```ruby
-logger = Dry.Logger(:test, template: :details).add_backend(stream: "logs/test.log")
-
-# This goes to $stdout and logs/test.log too
-logger.info "Hello World"
+# Logs to both $stdout and logs/test.log
 # [test] [INFO] [2022-11-17 11:46:12 +0100] Hello World
 ```
 
-### Skipping default behaviour
+### Block-based configuration
 
-If you don't want to log to the default `$stdout` you can skip it by passing in a block to the
-constructor:
+For more control, configure all backends in a block:
 
 ```ruby
-logger = Dry.Logger(:test) do |dispatcher|
-  dispatcher.add_backend(stream: "logs/test.log", template: :details)
+logger = Dry.Logger(:test) do |setup|
+  setup.add_backend(stream: "logs/test.log", template: :details)
+  setup.add_backend(stream: "logs/errors.log", log_if: :error?)
 end
 
-# This goes to logs/test.log
 logger.info "Hello World"
-# [test] [INFO] [2022-11-17 11:46:12 +0100] Hello World
+# Only logs to the files you configured (no stdout)
 ```
+
+When you use a block, dry-logger skips creating the default stdout backend, giving you complete control.
 
 ### Conditional logging
 
-You can tell your backends when exactly they should be logging using `log_if` option. It can be set
-to either a symbol that represents a method that `Dry::Logger::Entry` implements or a custom proc.
-
-Here's a simple example:
+Route logs to specific backends based on conditions using `log_if`:
 
 ```ruby
 logger = Dry.Logger(:test, template: :details)
   .add_backend(stream: "logs/requests.log", log_if: -> entry { entry.key?(:request) })
 
-# This goes only to $stdout
 logger.info "Hello World"
-# [test] [INFO] [2022-11-17 11:50:12 +0100] Hello World
+# Only to $stdout: [test] [INFO] [2022-11-17 11:50:12 +0100] Hello World
 
-# This goes to $stdout and logs/requests.log
 logger.info "GET /posts", request: true
+# To both $stdout and logs/requests.log
 # [test] [INFO] [2022-11-17 11:51:50 +0100] GET /posts request=true
 ```
 
-### Using custom templates
+## Templates and formatting
 
-You can provide customized text log templates using regular Ruby syntax for tokenized string templates:
+### Custom templates
+
+Customize the log format using sprintf-style templates:
 
 ```ruby
 logger = Dry.Logger(:test, template: "[%<severity>s] %<message>s")
@@ -103,14 +230,13 @@ logger.info "Hello World"
 
 The following tokens are supported:
 
-- `%<progname>s` - the name of your logger, ie `Dry.Logger(:test)` sets `progname` to `test`
-- `%<severity>s` - log level name
-- `%<time>s` - log entry timestamp
-- `%<message>s` - log text message passed as a string, ie `logger.info("Hello World")` sets `message` to `"Hello World"`
-- `%<payload>s` - optional log entry payload provided as keywords, ie `logger.info(text: "Hello World")` sets `payload` to `{text: "Hello World"}` and its presentation depends on the formatter that was used
+- `%<progname>s` - Logger identifier
+- `%<severity>s` - Log level (DEBUG, INFO, WARN, ERROR, FATAL)
+- `%<time>s` - Timestamp
+- `%<message>s` - Log message
+- `%<payload>s` - Structured data as key=value pairs
 
-Furthermore, you can use *payload keys* that are expected to be passed to a specific logging backend.
-Here's an example:
+You can also use payload keys directly in templates:
 
 ```ruby
 logger = Dry.Logger(:test, template: "[%<severity>s] %<verb>s %<path>s")
@@ -119,38 +245,28 @@ logger.info verb: "GET", path: "/users"
 # [INFO] GET /users
 ```
 
-### Using colorized text output
+### Colorized output
 
-You can use simple color tags to colorize specific values in the text output:
+Use color tags in templates for better readability:
 
 ```ruby
 logger = Dry.Logger(:test, template: "[%<severity>s] <blue>%<verb>s</blue> <green>%<path>s</green>")
 
-# This is now colorized, you gotta trust us
 logger.info verb: "GET", path: "/users"
-# [INFO] GET /users
+# [INFO] GET /users (with blue verb and green path)
 ```
 
-Following built-in color tags are supported:
+Available colors: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `gray`
 
-- black
-- red
-- green
-- yellow
-- blue
-- magenta
-- cyan
-- gray
+### Formatters
 
-### Customizing formatters
+dry-logger includes three formatters:
 
-There are three built-in formatters:
+- `:string` - Human-readable `key=value` format with color support (development)
+- `:json` - Structured JSON with UTC timestamps (production)
+- `:rack` - Optimized for HTTP request logging
 
-- `:string` - formats payload into `key=value` sequence and supports colorized output, suitable for development environmments
-- `:json` - suitable for production environments, formats timestamps into `UTC`
-- `:rack` - suitable for logging rack requests
-
-To configure a specific formatter, use the `formatter` option:
+Use the `formatter` option:
 
 ```ruby
 logger = Dry.Logger(:test, formatter: :rack)
@@ -159,26 +275,40 @@ logger.info verb: "GET", path: "/users", elapsed: "12ms", ip: "127.0.0.1", statu
 # [test] [INFO] [2022-11-17 12:04:30 +0100] GET 200 12ms 127.0.0.1 /users 312
 ```
 
-### Configuring log rotation
+## Log rotation
 
-You can use the Ruby Logger's [log rotation support](https://rubyapi.org/o/logger#class-Logger-label-Log+File+Rotation) for any stream-based logger backend.
+Rotate logs by size or time period:
 
-To rotate log files based on size, provide:
-
-- `shift_age:` as a positive integer: the number of log files to be in the rotation.
-- `shift_size:` as a positive integer: the maximum size (in bytes) of each log file; defaults to 1048576 (1 megabyte).
+**Size-based rotation:**
 
 ```ruby
-# Five 10-megabyte files.
-logger = Dry.logger(:test, stream: "logs/test.log", shift_age: 5, shift_size: 10485760)
+# Keep 5 files, max 10MB each
+logger = Dry.Logger(:test,
+  stream: "logs/test.log",
+  shift_age: 5,
+  shift_size: 10_485_760
+)
 ```
 
-To rotate log files based on age, provide:
-
-- `shift_age:` as a string period indicator (`"daily"`, `"weekly"`, `"monthly"`)
+**Time-based rotation:**
 
 ```ruby
-logger = Dry.logger(:test, stream: "logs/test.log", shift_age: "daily")
+# Rotate daily, weekly, or monthly
+logger = Dry.Logger(:test, stream: "logs/test.log", shift_age: "daily")
 ```
 
-See the [Ruby Logger documentation]((https://rubyapi.org/o/logger#class-Logger-label-Log+File+Rotation)) for more detail on its log rotation support.
+See Ruby's [Logger documentation](https://rubyapi.org/o/logger#class-Logger-label-Log+File+Rotation) for details.
+
+## Next steps
+
+Now that you understand the basics, explore more features:
+
+- [Backends](/gems/dry-logger/backends/) - Configure multiple logging destinations
+- [Formatters](/gems/dry-logger/formatters/) - Control output format (string, JSON, Rack)
+- [Templates](/gems/dry-logger/templates/) - Customize log message format
+- [Filtering](/gems/dry-logger/filtering/) - Filter sensitive data from logs
+- [Context](/gems/dry-logger/context/) - Add request-scoped data to log entries
+- [Tagged logging](/gems/dry-logger/tagging/) - Mark and filter log entries with tags
+- [Crash handling](/gems/dry-logger/crash-handling/) - Customize behavior when logging itself crashes
+- [Testing](/gems/dry-logger/testing/) - Test your application's logging
+- [Examples](/gems/dry-logger/examples/) - Complete, realistic configuration examples
