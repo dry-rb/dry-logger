@@ -250,7 +250,7 @@ Used internally when logging itself crashes:
 "%<backtrace>s"
 ```
 
-For complete, realistic configuration examples, see the [Examples](/gems/dry-logger/examples/) page.
+For complete, realistic configuration examples, see the [Examples](docs::examples) page.
 
 ## Tags in templates
 
@@ -267,7 +267,7 @@ end
 # [production web] Request received path="/"
 ```
 
-Learn more about tagging in the [Advanced Usage](/gems/dry-logger/advanced/) guide.
+Learn more about tagging in the [Tagging guide](docs::tagging).
 
 ## Best practices
 
@@ -302,4 +302,4 @@ template: "%<message>s | User: %<user_id>s | Action: %<action>s"
 
 This makes logs easier to parse visually and with tools.
 
-For complete configuration examples showing templates in action, see the [Examples](/gems/dry-logger/examples/) page.
+For complete configuration examples showing templates in action, see the [Examples](docs::examples) page.

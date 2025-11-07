@@ -303,12 +303,12 @@ See Ruby's [Logger documentation](https://rubyapi.org/o/logger#class-Logger-labe
 
 Now that you understand the basics, explore more features:
 
-- [Backends](/gems/dry-logger/backends/) - Configure multiple logging destinations
-- [Formatters](/gems/dry-logger/formatters/) - Control output format (string, JSON, Rack)
-- [Templates](/gems/dry-logger/templates/) - Customize log message format
-- [Filtering](/gems/dry-logger/filtering/) - Filter sensitive data from logs
-- [Context](/gems/dry-logger/context/) - Add request-scoped data to log entries
-- [Tagged logging](/gems/dry-logger/tagging/) - Mark and filter log entries with tags
-- [Crash handling](/gems/dry-logger/crash-handling/) - Customize behavior when logging itself crashes
-- [Testing](/gems/dry-logger/testing/) - Test your application's logging
-- [Examples](/gems/dry-logger/examples/) - Complete, realistic configuration examples
+- [Backends](docs::backends) - Configure multiple logging destinations
+- [Formatters](docs::formatters) - Control output format (string, JSON, Rack)
+- [Templates](docs::templates) - Customize log message format
+- [Filtering](docs::filtering) - Filter sensitive data from logs
+- [Context](docs::context) - Add request-scoped data to log entries
+- [Tagged logging](docs::tagging) - Mark and filter log entries with tags
+- [Crash handling](docs::crash-handling) - Customize behavior when logging itself crashes
+- [Testing](docs::testing) - Test your application's logging
+- [Examples](docs::examples) - Complete, realistic configuration examples

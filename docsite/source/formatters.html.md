@@ -117,7 +117,7 @@ The string formatter supports several customization options:
 
 #### Templates
 
-Control the output format using templates (see [Templates](/gems/dry-logger/templates/) for details):
+Control the output format using templates (see [Templates](docs::templates) for details):
 
 ```ruby
 logger = Dry.Logger(:my_app,
@@ -271,4 +271,4 @@ logger.info(user_id: 42, duration: 150)
 # USER:42 took 150ms
 ```
 
-For complete, realistic configuration examples, see the [Examples](/gems/dry-logger/examples/) page.
+For complete, realistic configuration examples, see the [Examples](docs::examples) page.
