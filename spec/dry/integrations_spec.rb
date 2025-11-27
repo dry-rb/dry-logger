@@ -15,7 +15,11 @@ RSpec.describe "Dry.Logger" do
     end
 
     let(:sequel) do
-      Sequel.sqlite
+      if RUBY_PLATFORM == "java"
+        Sequel.connect("jdbc:sqlite::memory:")
+      else
+        Sequel.sqlite
+      end
     end
 
     before do
