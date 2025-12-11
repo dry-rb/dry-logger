@@ -6,6 +6,7 @@ require "pathname"
 require "dry/logger/constants"
 require "dry/logger/backends/proxy"
 require "dry/logger/entry"
+require "dry/logger/execution_context"
 
 module Dry
   module Logger
@@ -17,18 +18,6 @@ module Dry
       # @since 1.0.0
       # @api private
       attr_reader :id
-
-      # (EXPERIMENTAL) Shared payload context
-      #
-      # @example
-      #   logger.context[:component] = "test"
-      #
-      #   logger.info "Hello World"
-      #   # Hello World component=test
-      #
-      # @since 1.0.0
-      # @api public
-      attr_reader :context
 
       # @since 1.0.0
       # @api private
@@ -86,21 +75,13 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      def self.default_context
-        Thread.current[:__dry_logger__] ||= {}
-      end
-
-      # @since 1.0.0
-      # @api private
-      def initialize(
-        id, backends: [], tags: [], context: self.class.default_context, **options
-      )
+      def initialize(id, backends: [], tags: [], context: {}, **options)
         @id = id
         @backends = backends
         @options = {**options, progname: id}
         @mutex = Mutex.new
-        @context = context
-        @tags = tags
+        @default_tags = tags.freeze
+        @default_context = context.freeze
         @clock = Clock.new(**(options[:clock] || EMPTY_HASH))
         @on_crash = options[:on_crash] || ON_CRASH
       end
@@ -226,7 +207,7 @@ module Dry
             clock: clock,
             progname: progname,
             severity: severity,
-            tags: @tags,
+            tags: current_tags,
             message: message,
             payload: {**context, **payload}
           )
@@ -244,7 +225,22 @@ module Dry
         true
       end
 
-      # (EXPERIMENTAL) Tagged logging withing the provided block
+      # Shared payload context
+      #
+      # @example
+      #   logger.context[:component] = "test"
+      #
+      #   logger.info "Hello World"
+      #   # Hello World component=test
+      #
+      # @since 1.0.0
+      # @api public
+      def context
+        @context_key ||= :"context_#{object_id}"
+        ExecutionContext[@context_key] ||= @default_context.dup
+      end
+
+      # Tagged logging withing the provided block
       #
       # @example
       #   logger.tagged("red") do
@@ -258,10 +254,10 @@ module Dry
       # @since 1.0.0
       # @api public
       def tagged(*tags)
-        @tags.concat(tags)
+        tags_stack.push(tags)
         yield
       ensure
-        @tags = []
+        tags_stack.pop
       end
 
       # Add a new backend to an existing dispatcher
@@ -309,6 +305,17 @@ module Dry
       def forward(meth, ...)
         each_backend { |backend| backend.public_send(meth, ...) }
         true
+      end
+
+      private
+
+      def tags_stack
+        @tags_key ||= :"tags_#{object_id}"
+        ExecutionContext[@tags_key] ||= @default_tags.dup
+      end
+
+      def current_tags
+        tags_stack.flatten
       end
     end
   end
