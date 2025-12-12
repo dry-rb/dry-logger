@@ -32,12 +32,15 @@ end
 
 RSpec.configure do |config|
   global_registries = %i[formatters templates].to_h { |reg| [reg, Dry::Logger.__send__(reg)] }
-
   config.around do |example|
     example.run
   ensure
     global_registries.each do |reg, val|
       Dry::Logger.instance_variable_set("@#{reg}", val)
     end
+  end
+
+  config.after do
+    Dry::Logger::ExecutionContext.clear
   end
 end
