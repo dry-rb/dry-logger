@@ -7,6 +7,8 @@ gemspec:
   email: ["info@hanakai.org"]
   summary: "Lightweight structured logging for Ruby applications"
   homepage: "https://dry-rb.org/gems/dry-logger"
+  runtime_dependencies:
+    - logger
   development_dependencies:
     - bundler
     - rake
