@@ -210,23 +210,29 @@ RSpec.describe Dry::Logger::Dispatcher do
       end
 
       it "handles nested tagged blocks" do
-        logger.tagged(:outer) do
-          logger.info("outer message")
-          logger.tagged(:inner) do
-            logger.info("inner message")
+        logger.tagged(:first) do
+          logger.info("first message")
+          logger.tagged(:second) do
+            logger.info("second message")
+            logger.tagged(:third) do
+              logger.info("third message")
+            end
           end
-          logger.info("outer again")
+          logger.info("first again")
         end
 
         lines = stream.string.lines
-        expect(lines[0]).to include("[outer]")
-        expect(lines[0]).to include("outer message")
+        expect(lines[0]).to include("[first]")
+        expect(lines[0]).to include("first message")
 
-        expect(lines[1]).to include("[outer inner]")
-        expect(lines[1]).to include("inner message")
+        expect(lines[1]).to include("[first second]")
+        expect(lines[1]).to include("second message")
 
-        expect(lines[2]).to include("[outer]")
-        expect(lines[2]).to include("outer again")
+        expect(lines[2]).to include("[first second third]")
+        expect(lines[2]).to include("third message")
+
+        expect(lines[3]).to include("[first]")
+        expect(lines[3]).to include("first again")
       end
     end
   end
