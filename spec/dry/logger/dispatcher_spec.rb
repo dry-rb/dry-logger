@@ -208,6 +208,32 @@ RSpec.describe Dry::Logger::Dispatcher do
         expect(stream).to include("[analytics metrics=true] test 1")
         expect(stream).to include("[analytics metrics=true] test 2")
       end
+
+      it "handles nested tagged blocks" do
+        logger.tagged(:first) do
+          logger.info("first message")
+          logger.tagged(:second) do
+            logger.info("second message")
+            logger.tagged(:third) do
+              logger.info("third message")
+            end
+          end
+          logger.info("first again")
+        end
+
+        lines = stream.string.lines
+        expect(lines[0]).to include("[first]")
+        expect(lines[0]).to include("first message")
+
+        expect(lines[1]).to include("[first second]")
+        expect(lines[1]).to include("second message")
+
+        expect(lines[2]).to include("[first second third]")
+        expect(lines[2]).to include("third message")
+
+        expect(lines[3]).to include("[first]")
+        expect(lines[3]).to include("first again")
+      end
     end
   end
 
@@ -224,6 +250,53 @@ RSpec.describe Dry::Logger::Dispatcher do
 
       expect(stream).to include('test 1 component="test"')
       expect(stream).to include('test 2 component="test"')
+    end
+  end
+
+  describe "thread safety" do
+    subject(:logger) do
+      Dry.Logger(:test, stream: stream, template: "[%<tags>s] %<message>s %<payload>s", context: {})
+    end
+
+    it "isolates tags across threads" do
+      threads = []
+
+      5.times do |i|
+        threads << Thread.new do
+          logger.tagged(:"thread_#{i}") do
+            sleep(rand * 0.01)
+            logger.info("message #{i}")
+          end
+        end
+      end
+
+      threads.each(&:join)
+
+      lines = stream.string.lines
+      5.times do |i|
+        line = lines.find { |l| l.include?("message #{i}") }
+        expect(line).to include("[thread_#{i}]")
+      end
+    end
+
+    it "isolates context across threads" do
+      threads = []
+
+      5.times do |i|
+        threads << Thread.new do
+          logger.context[:thread_id] = i
+          sleep(rand * 0.01)
+          logger.info("message #{i}")
+        end
+      end
+
+      threads.each(&:join)
+
+      lines = stream.string.lines
+      5.times do |i|
+        line = lines.find { |l| l.include?("message #{i}") }
+        expect(line).to include("thread_id=#{i}")
+      end
     end
   end
 end
