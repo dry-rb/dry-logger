@@ -19,6 +19,20 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
+[Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.2.1...main
+
+## [1.2.1] - 2025-12-16
+
+### Changed
+
+- Support Ruby 4.0 by adding the `"logger"` gem to the list of runtime dependencies. (@timriley in #39)
+
+### Fixed
+
+- Ensure changes to `logger.context` and calls to `logger.tagged` are threadsafe. (@timriley in #38)
+
+[1.2.1]: https://github.com/dry-rb/dry-logger/compare/v1.2.0...v1.2.1
+
 ## [1.2.0] - 2025-11-05
 
 ### Changed
