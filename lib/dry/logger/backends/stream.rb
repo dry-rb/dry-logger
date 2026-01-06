@@ -21,7 +21,7 @@ module Dry
 
         # @since 0.1.0
         # @api private
-        def initialize( # rubocop:disable Style/ParameterLists
+        def initialize(
           stream:,
           formatter:,
           level: DEFAULT_LEVEL,

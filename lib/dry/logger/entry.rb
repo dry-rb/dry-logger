@@ -44,7 +44,6 @@ module Dry
 
       # @since 1.0.0
       # @api private
-      # rubocop:disable Metrics/ParameterLists
       def initialize(clock:, progname:, severity:, tags: EMPTY_ARRAY, message: nil,
                      payload: EMPTY_HASH)
         @clock = clock
