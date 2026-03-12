@@ -68,8 +68,19 @@ module Dry
 
         # @since 1.0.0
         # @api private
-        def %(tokens)
-          output = value % tokens
+        def %(other)
+          begin
+            output = value % other
+          rescue Encoding::CompatibilityError
+            sanitized_tokens = other.transform_values { |v|
+              if v.respond_to?(:encode)
+                v.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+              else
+                v
+              end
+            }
+            output = value % sanitized_tokens
+          end
           output.strip!
           output.split(NEW_LINE).map(&:rstrip).join(NEW_LINE)
         end

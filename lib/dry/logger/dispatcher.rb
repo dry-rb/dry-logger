@@ -53,7 +53,9 @@ module Dry
           severity: "FATAL",
           progname: progname,
           time: Time.now,
-          log_entry: [message, payload].map(&:to_s).reject(&:empty?).join(SEPARATOR),
+          log_entry: [message, payload].map { |s|
+            s.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+          }.reject(&:empty?).join(SEPARATOR),
           exception: exception.class,
           message: exception.message,
           backtrace: TAB + exception.backtrace.join(NEW_LINE + TAB)

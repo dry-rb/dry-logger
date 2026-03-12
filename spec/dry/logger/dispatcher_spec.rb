@@ -16,6 +16,16 @@ RSpec.describe Dry::Logger::Dispatcher do
 
         expect(stream).to include(message)
       end
+
+      it "handles encoding mismatches between message and payload in normal logging" do
+        message = +"\xFF\xFEnormal"
+        message.force_encoding("ASCII-8BIT")
+
+        payload = {data: "café"}
+
+        logger.public_send(level, message, **payload)
+        expect(stream).to include('??normal data="café"')
+      end
     end
 
     describe "##{level} when a custom backend crashes" do
@@ -41,6 +51,15 @@ RSpec.describe Dry::Logger::Dispatcher do
         # TODO: for some reason output matcher doesn't work here
         # .     so this is going to spit things out in the test output
         expect { logger.public_send(level, "Hello World!") }.to_not raise_error
+      end
+
+      it "handles encoding mismatches between message and payload" do
+        message = +"\xFF\xFEnormal"
+        message.force_encoding("ASCII-8BIT")
+
+        payload = {data: "café"}
+
+        expect { logger.public_send(level, message, **payload) }.to_not raise_error
       end
     end
 
