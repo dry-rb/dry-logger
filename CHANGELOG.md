@@ -17,11 +17,17 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
-- Exception when message and metadata have different encodings (@katafrakt in #40)
-
 ### Security
 
-[Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.2.1...main
+[Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.2.2...main
+
+## [1.2.2] - 2026-03-13
+
+### Fixed
+
+- Exception when message and metadata have different encodings (@katafrakt in #40)
+
+[1.2.2]: https://github.com/dry-rb/dry-logger/compare/v1.2.1...v1.2.2
 
 ## [1.2.1] - 2025-12-16
 
