@@ -8,7 +8,7 @@ gemspec:
   summary: "Lightweight structured logging for Ruby applications"
   homepage: "https://dry-rb.org/gems/dry-logger"
   runtime_dependencies:
-    - logger
+    - [logger]
   development_dependencies:
     - bundler
     - rake
