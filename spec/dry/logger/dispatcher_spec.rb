@@ -272,49 +272,49 @@ RSpec.describe Dry::Logger::Dispatcher do
     end
   end
 
-  describe "thread safety" do
+  describe "fiber safety" do
     subject(:logger) do
       Dry.Logger(:test, stream: stream, template: "[%<tags>s] %<message>s %<payload>s", context: {})
     end
 
-    it "isolates tags across threads" do
-      threads = []
+    it "isolates tags across fibers" do
+      fibers = []
 
       5.times do |i|
-        threads << Thread.new do
-          logger.tagged(:"thread_#{i}") do
+        fibers << Fiber.new do
+          logger.tagged(:"fiber_#{i}") do
             sleep(rand * 0.01)
             logger.info("message #{i}")
           end
         end
       end
 
-      threads.each(&:join)
+      fibers.each(&:resume)
 
       lines = stream.string.lines
       5.times do |i|
         line = lines.find { |l| l.include?("message #{i}") }
-        expect(line).to include("[thread_#{i}]")
+        expect(line).to include("[fiber_#{i}]")
       end
     end
 
-    it "isolates context across threads" do
-      threads = []
+    it "isolates context across fibers" do
+      fibers = []
 
       5.times do |i|
-        threads << Thread.new do
-          logger.context[:thread_id] = i
+        fibers << Fiber.new do
+          logger.context[:fiber_id] = i
           sleep(rand * 0.01)
           logger.info("message #{i}")
         end
       end
 
-      threads.each(&:join)
+      fibers.each(&:resume)
 
       lines = stream.string.lines
       5.times do |i|
         line = lines.find { |l| l.include?("message #{i}") }
-        expect(line).to include("thread_id=#{i}")
+        expect(line).to include("fiber_id=#{i}")
       end
     end
   end

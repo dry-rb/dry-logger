@@ -46,19 +46,58 @@ RSpec.describe Dry::Logger::ExecutionContext do
   end
 
   describe "thread isolation" do
-    it "isolates storage between threads" do
+    it "makes copy on write in new thread" do
+      context[:main] = "main_value"
+
+      thread = Thread.new do
+        context[:main] = "new_value"
+        context[:fiber] = "fiber_value"
+      end
+      thread.join
+
+      expect(context[:main]).to eq("main_value")
+      expect(context[:fiber]).to be_nil
+    end
+
+    it "inherits parent thread fiber storage in new thread" do
       context[:main] = "main_value"
 
       thread_value = nil
       thread = Thread.new do
-        context[:thread] = "thread_value"
         thread_value = context[:main]
       end
       thread.join
 
       expect(context[:main]).to eq("main_value")
-      expect(context[:thread]).to be_nil
-      expect(thread_value).to be_nil
+      expect(thread_value).to eq("main_value")
+    end
+  end
+
+  describe "fiber isolation" do
+    it "makes copy on write in new fiber" do
+      context[:main] = "main_value"
+
+      fiber = Fiber.new do
+        context[:main] = "new_value"
+        context[:fiber] = "fiber_value"
+      end
+      fiber.resume
+
+      expect(context[:main]).to eq("main_value")
+      expect(context[:fiber]).to be_nil
+    end
+
+    it "inherits parent storage in new fiber" do
+      context[:main] = "main_value"
+
+      fiber_value = nil
+      fiber = Fiber.new do
+        fiber_value = context[:main]
+      end
+      fiber.resume
+
+      expect(context[:main]).to eq("main_value")
+      expect(fiber_value).to eq("main_value")
     end
   end
 end

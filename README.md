@@ -7,8 +7,7 @@
 
 # dry-logger [![Gem Version](https://badge.fury.io/rb/dry-logger.svg)][rubygem] [![CI Status](https://github.com/dry-rb/dry-logger/workflows/CI/badge.svg)][actions]
 
-[![Forum](https://img.shields.io/badge/Forum-dc360f?logo=discourse&logoColor=white)][forum]
-[![Chat](https://img.shields.io/badge/Chat-717cf8?logo=discord&logoColor=white)][chat]
+This is a fork of the original **dry-logger** that supports fiber-safe isolation. The main difference is that child fibers inherit the parent context, with copy-on-write semantics for any modifications.
 
 ## Links
 
@@ -19,4 +18,3 @@
 ## License
 
 See `LICENSE` file.
-

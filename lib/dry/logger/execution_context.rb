@@ -2,7 +2,7 @@
 
 module Dry
   module Logger
-    # Provides isolated thread-local storage for logger values.
+    # Provides isolated fiber-local storage for logger values.
     #
     # @api private
     module ExecutionContext
@@ -19,13 +19,16 @@ module Dry
         end
 
         # Sets a value in the current execution context.
+        # Use copy-on-write for the inherited CONTEXT_KEY hash.
         #
         # @param key [Symbol] the key to store
         # @param value [Object] the value to store
         #
         # @return [Object] the stored value
         def []=(key, value)
-          context[key] = value
+          current_store[CONTEXT_KEY] = context.merge(key => value)
+
+          context[key]
         end
 
         # Clears all values from the current execution context.
@@ -43,7 +46,7 @@ module Dry
         end
 
         def current_store
-          Thread.current
+          Fiber
         end
       end
     end
