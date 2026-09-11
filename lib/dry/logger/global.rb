@@ -83,7 +83,7 @@ module Dry
           when nil then templates[:default]
           else
             raise ArgumentError,
-                  ":template option must be a Symbol or a String (`#{template_spec}` given)"
+              ":template option must be a Symbol or a String (`#{template_spec}` given)"
           end
 
         formatter_options = {**options, template: template}
