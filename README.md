@@ -2,7 +2,7 @@
 
 [actions]: https://github.com/dry-rb/dry-logger/actions
 [chat]: https://discord.gg/naQApPAsZB
-[forum]: https://discourse.hanamirb.org
+[forum]: https://discourse.hanakai.org
 [rubygem]: https://rubygems.org/gems/dry-logger
 
 # dry-logger [![Gem Version](https://badge.fury.io/rb/dry-logger.svg)][rubygem] [![CI Status](https://github.com/dry-rb/dry-logger/workflows/CI/badge.svg)][actions]
