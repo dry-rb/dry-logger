@@ -9,7 +9,15 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
+- Support `Regexp` log filters, matched against each key and its full dotted path. (@timriley in #43)
+
 ### Changed
+
+- Match log filters on substrings, ignoring case. For example, `"password"` now also filters `password_confirmation`, and `"user.token"` filters `admin.user.token_hash`. (@timriley in #43)
+- Match string and symbol filters literally. Use a `Regexp` filter (such as `/pass/`) instead of regex syntax in a string. (@timriley in #43)
+- Ignore blank filters, and print a warning. (@timriley in #43)
+- Filter hashes inside arrays, such as `{users: [{password: "secret"}]}`. (@timriley in #43)
+- Only filter inside hashes and arrays, not hash-like `Enumerable` objects. Convert these to hashes (for example, with `#to_h`) before logging. (@timriley in #43)
 
 ### Deprecated
 
