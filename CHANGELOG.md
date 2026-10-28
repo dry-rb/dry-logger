@@ -9,7 +9,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
-- Support `Regexp` log filters, matched against each key and its full dotted path. (@timriley in #43)
+- Support `Regexp` log filters, matched against each key and its full dotted path, ignoring case. (@timriley in #43)
 
 ### Changed
 

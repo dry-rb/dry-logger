@@ -14,8 +14,8 @@ module Dry
     #   example, `/\Apin\z/` matches `pin` and `user.pin`, and `/\Acard\.number\z/` matches
     #   `card.number`, but not `payment.card.number`.
     #
-    # String and symbol filters ignore case. Regexp filters are case-sensitive unless they use the
-    # `i` flag, such as `/\Apin\z/i`.
+    # All filters ignore case, both strings and regexps. To make a regexp filter case-sensitive, use
+    # Ruby's inline `(?-i)` modifier, such as `/(?-i)\APin\z/`.
     #
     # Whitespace is stripped from the start and end of string and symbol filters. Fully blank
     # filters are ignored with a warning, since they would match every key.
@@ -60,11 +60,19 @@ module Dry
         present
       end
 
-      # Returns a regexp matching any of the filters. With no filters, it matches nothing.
+      # Returns a regexp matching any of the filters, ignoring case. With no filters, it matches
+      # nothing.
+      #
+      # Regexp filters keep their other options. Inline modifiers such as `(?-i)` still apply, so
+      # they can opt back into case-sensitive matching.
       def build_matcher(filters)
         Regexp.union(
           filters.map { |filter|
-            filter.is_a?(Regexp) ? filter : /#{Regexp.escape(filter.to_s)}/i
+            if filter.is_a?(Regexp)
+              Regexp.new(filter.source, filter.options | Regexp::IGNORECASE)
+            else
+              Regexp.new(Regexp.escape(filter), Regexp::IGNORECASE)
+            end
           }
         )
       end

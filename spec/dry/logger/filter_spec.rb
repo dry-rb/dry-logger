@@ -190,6 +190,27 @@ RSpec.describe Dry::Logger::Filter do
         expect(result[:card][:number]).to eq("[FILTERED]")
         expect(result[:number]).to eq("42")
       end
+
+      it "ignores case" do
+        result = filter.call("PIN" => "1234")
+
+        expect(result["PIN"]).to eq("[FILTERED]")
+      end
+
+      it "keeps the regexp's other options" do
+        filter = described_class.new([/\A pin \z/x])
+        result = filter.call(pin: "1234")
+
+        expect(result[:pin]).to eq("[FILTERED]")
+      end
+
+      it "matches case-sensitively when the regexp turns off case-insensitivity" do
+        filter = described_class.new([/(?-i)\APin\z/])
+        result = filter.call("Pin" => "1234", "pin" => "5678")
+
+        expect(result["Pin"]).to eq("[FILTERED]")
+        expect(result["pin"]).to eq("5678")
+      end
     end
 
     context "with blank filters" do
