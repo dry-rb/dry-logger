@@ -195,13 +195,20 @@ RSpec.describe Dry::Logger::Filter do
     context "with blank filters" do
       it "ignores blank filters, with a warning" do
         filter = nil
-        expect { filter = described_class.new(["", "password"]) }
+        expect { filter = described_class.new(["   ", "password"]) }
           .to output(/\Adry-logger: ignoring blank log filter\(s\)\./).to_stderr
 
         result = filter.call(password: "secret", user: "john")
 
         expect(result[:password]).to eq("[FILTERED]")
         expect(result[:user]).to eq("john")
+      end
+
+      it "strips whitespace from the start and end of filters" do
+        filter = described_class.new([" token "])
+        result = filter.call(auth_token: "abc123")
+
+        expect(result[:auth_token]).to eq("[FILTERED]")
       end
 
       it "does not warn when there are no blank filters" do

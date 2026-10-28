@@ -15,7 +15,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 - Match log filters on substrings, ignoring case. For example, `"password"` now also filters `password_confirmation`, and `"user.token"` filters `admin.user.token_hash`. (@timriley in #43)
 - Match string and symbol filters literally. Use a `Regexp` filter (such as `/pass/`) instead of regex syntax in a string. (@timriley in #43)
-- Ignore blank filters, and print a warning. (@timriley in #43)
+- Strip whitespace from the start and end of string and symbol filters. Ignore blank filters, and print a warning. (@timriley in #43)
 - Filter hashes inside arrays, such as `{users: [{password: "secret"}]}`. (@timriley in #43)
 - Only filter inside hashes and arrays, not hash-like `Enumerable` objects. Convert these to hashes (for example, with `#to_h`) before logging. (@timriley in #43)
 

@@ -17,8 +17,8 @@ module Dry
     # String and symbol filters ignore case. Regexp filters are case-sensitive unless they use the
     # `i` flag, such as `/\Apin\z/i`.
     #
-    # Blank string and symbol filters are ignored, with a warning, since they would match every
-    # key.
+    # Whitespace is stripped from the start and end of string and symbol filters. Fully blank
+    # filters are ignored with a warning, since they would match every key.
     #
     # When a key matches and its value is a hash or an array, every value inside it is filtered.
     #
@@ -36,7 +36,7 @@ module Dry
       private attr_reader :matcher
 
       def initialize(filters = [])
-        @matcher = build_matcher(reject_blank_filters(filters))
+        @matcher = build_matcher(reject_blank_filters(strip_filters(filters)))
       end
 
       def call(hash)
@@ -44,6 +44,11 @@ module Dry
       end
 
       private
+
+      # Strips whitespace from string filters.
+      def strip_filters(filters)
+        filters.map { |filter| filter.is_a?(Regexp) ? filter : filter.to_s.strip }
+      end
 
       def reject_blank_filters(filters)
         blank, present = filters.partition { |filter| filter.to_s.empty? }
