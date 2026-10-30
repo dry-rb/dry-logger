@@ -98,6 +98,143 @@ RSpec.describe Dry::Logger::Filter do
         expect(result[:credentials][:api_key]).to eq("[FILTERED]")
         expect(result[:credentials][:public_key]).to eq("pub456")
       end
+
+      it "filters nested paths that contain a filter" do
+        filter = described_class.new(%w[user.token])
+        result = filter.call(superuser: {tokens: "abc123"})
+
+        expect(result[:superuser][:tokens]).to eq("[FILTERED]")
+      end
+    end
+
+    context "with key and path filters together" do
+      subject(:filter) { described_class.new(%w[token user.password]) }
+
+      it "applies both kinds of filter" do
+        input = {auth_token: "abc123", user: {password: "secret"}, admin: {password: "keep-this"}}
+        result = filter.call(input)
+
+        expect(result[:auth_token]).to eq("[FILTERED]")
+        expect(result[:user][:password]).to eq("[FILTERED]")
+        expect(result[:admin][:password]).to eq("keep-this")
+      end
+
+      it "applies both kinds of filter to literal keys that contain a dot" do
+        input = {"session.token" => "abc123", "user.password" => "secret"}
+        result = filter.call(input)
+
+        expect(result["session.token"]).to eq("[FILTERED]")
+        expect(result["user.password"]).to eq("[FILTERED]")
+      end
+    end
+
+    context "with substring matching" do
+      subject(:filter) { described_class.new(%w[passw token]) }
+
+      it "filters keys that contain a filter" do
+        input = {password_confirmation: "secret", user_password: "secret", user: "john"}
+        result = filter.call(input)
+
+        expect(result[:password_confirmation]).to eq("[FILTERED]")
+        expect(result[:user_password]).to eq("[FILTERED]")
+        expect(result[:user]).to eq("john")
+      end
+
+      it "ignores case" do
+        result = filter.call("X-Auth-TOKEN" => "abc123")
+
+        expect(result["X-Auth-TOKEN"]).to eq("[FILTERED]")
+      end
+
+      it "does not treat regexp syntax in strings as a regexp" do
+        filter = described_class.new(["^password$"])
+        input = {password: "keep", "^password$" => "secret"}
+        result = filter.call(input)
+
+        expect(result[:password]).to eq("keep")
+        expect(result["^password$"]).to eq("[FILTERED]")
+      end
+    end
+
+    context "with symbol filters" do
+      subject(:filter) { described_class.new(%i[password]) }
+
+      it "filters keys that contain a filter" do
+        result = filter.call(password_confirmation: "secret")
+
+        expect(result[:password_confirmation]).to eq("[FILTERED]")
+      end
+    end
+
+    context "with regexp filters" do
+      subject(:filter) { described_class.new([/\Apin\z/, /\Acard\.number\z/]) }
+
+      it "filters keys that match a regexp" do
+        input = {pin: "1234", pinned: true}
+        result = filter.call(input)
+
+        expect(result[:pin]).to eq("[FILTERED]")
+        expect(result[:pinned]).to eq(true)
+      end
+
+      it "filters nested keys that match a regexp" do
+        result = filter.call(user: {pin: "1234"})
+
+        expect(result[:user][:pin]).to eq("[FILTERED]")
+      end
+
+      it "filters keys whose full dotted path matches a regexp" do
+        input = {card: {number: "4545"}, number: "42"}
+        result = filter.call(input)
+
+        expect(result[:card][:number]).to eq("[FILTERED]")
+        expect(result[:number]).to eq("42")
+      end
+
+      it "ignores case" do
+        result = filter.call("PIN" => "1234")
+
+        expect(result["PIN"]).to eq("[FILTERED]")
+      end
+
+      it "keeps the regexp's other options" do
+        filter = described_class.new([/\A pin \z/x])
+        result = filter.call(pin: "1234")
+
+        expect(result[:pin]).to eq("[FILTERED]")
+      end
+
+      it "matches case-sensitively when the regexp turns off case-insensitivity" do
+        filter = described_class.new([/(?-i)\APin\z/])
+        result = filter.call("Pin" => "1234", "pin" => "5678")
+
+        expect(result["Pin"]).to eq("[FILTERED]")
+        expect(result["pin"]).to eq("5678")
+      end
+    end
+
+    context "with blank filters" do
+      it "ignores blank filters, with a warning" do
+        filter = nil
+        expect { filter = described_class.new(["   ", "password"]) }
+          .to output(/\Adry-logger: ignoring blank log filter\(s\)\./).to_stderr
+
+        result = filter.call(password: "secret", user: "john")
+
+        expect(result[:password]).to eq("[FILTERED]")
+        expect(result[:user]).to eq("john")
+      end
+
+      it "strips whitespace from the start and end of filters" do
+        filter = described_class.new([" token "])
+        result = filter.call(auth_token: "abc123")
+
+        expect(result[:auth_token]).to eq("[FILTERED]")
+      end
+
+      it "does not warn when there are no blank filters" do
+        expect { described_class.new(["password"]) }.not_to output.to_stderr
+      end
     end
 
     context "with parent key filtering" do
@@ -164,20 +301,47 @@ RSpec.describe Dry::Logger::Filter do
       end
     end
 
-    context "with non-hash enumerables" do
-      subject(:filter) { described_class.new(%w[password]) }
+    context "with arrays" do
+      subject(:filter) { described_class.new(%w[password tokens]) }
 
-      it "does not attempt to filter array values" do
-        input = {
-          users: [{password: "secret", name: "john"}],
-          password: "filtered"
-        }
+      it "filters hashes inside arrays" do
+        input = {users: [{password: "secret", name: "john"}, {password: "secret2", name: "jane"}]}
         result = filter.call(input)
 
-        # Top-level password is filtered
-        expect(result[:password]).to eq("[FILTERED]")
-        # Array is left as-is (filtering doesn't traverse arrays)
-        expect(result[:users]).to eq([{password: "secret", name: "john"}])
+        expect(result[:users]).to eq(
+          [{password: "[FILTERED]", name: "john"}, {password: "[FILTERED]", name: "jane"}]
+        )
+      end
+
+      it "filters hashes inside nested arrays" do
+        input = {groups: [[{password: "secret", name: "john"}]]}
+        result = filter.call(input)
+
+        expect(result[:groups]).to eq([[{password: "[FILTERED]", name: "john"}]])
+      end
+
+      it "filters every item when the array's key matches" do
+        input = {tokens: ["abc", {value: "def"}], names: ["john", "jane"]}
+        result = filter.call(input)
+
+        expect(result[:tokens]).to eq(["[FILTERED]", {value: "[FILTERED]"}])
+        expect(result[:names]).to eq(["john", "jane"])
+      end
+
+      it "uses the array's key in dotted paths" do
+        filter = described_class.new(%w[users.password])
+        input = {users: [{password: "secret", name: "john"}]}
+        result = filter.call(input)
+
+        expect(result[:users]).to eq([{password: "[FILTERED]", name: "john"}])
+      end
+
+      it "does not mutate the original arrays" do
+        input = {users: [{password: "secret"}]}
+
+        filter.call(input)
+
+        expect(input).to eq(users: [{password: "secret"}])
       end
     end
   end
