@@ -18,6 +18,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - Strip whitespace from the start and end of string and symbol filters. Ignore blank filters, and print a warning. (@timriley in #43)
 - Filter hashes inside arrays, such as `{users: [{password: "secret"}]}`. (@timriley in #43)
 - Only filter inside hashes and arrays, not hash-like `Enumerable` objects. Convert these to hashes (for example, with `#to_h`) before logging. (@timriley in #43)
+- Speed up formatting of log entries by resolving the `format_<key>` method for each entry key once per formatter, instead of for every value of every entry. (@parndt)
 
 ### Deprecated
 

@@ -69,12 +69,35 @@ module Dry
         # @since 1.0.0
         # @api private
         def format_values(entry)
-          entry
-            .to_h
-            .map { |key, value|
-              [key, respond_to?(meth = "format_#{key}", true) ? __send__(meth, value) : value]
-            }
-            .to_h
+          entry.to_h.to_h { |key, value|
+            formatter = value_formatter(key)
+            [key, formatter ? __send__(formatter, value) : value]
+          }
+        end
+
+        private
+
+        # @api private
+        VALUE_FORMATTERS_LIMIT = 256
+        private_constant :VALUE_FORMATTERS_LIMIT
+
+        # Returns the name of the `format_<key>` method for an entry key, or nil if there is none.
+        #
+        # Names are remembered per key, up to a limit, since payload keys can be arbitrary. The
+        # hash is replaced rather than mutated, so formatters shared between threads need no lock.
+        #
+        # @api private
+        def value_formatter(key)
+          known = @value_formatters || EMPTY_HASH
+
+          known.fetch(key) {
+            name = :"format_#{key}"
+            formatter = name if respond_to?(name, true)
+
+            @value_formatters = known.merge(key => formatter).freeze if known.size < VALUE_FORMATTERS_LIMIT
+
+            formatter
+          }
         end
       end
     end
