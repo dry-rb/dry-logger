@@ -80,10 +80,11 @@ module Dry
       # Returns a filtered copy of the hash, leaving the original unchanged.
       def _filter_hash(hash, parent_path = nil)
         hash.each_with_object({}) do |(key, value), result|
-          path = parent_path ? "#{parent_path}#{PATH_SEPARATOR}#{key}" : key.to_s
+          key_name = key.to_s
+          path = parent_path ? "#{parent_path}#{PATH_SEPARATOR}#{key_name}" : key_name
 
           result[key] =
-            if _filter?(key.to_s, path)
+            if _filter?(key_name, path)
               _filtered_value(value)
             else
               _filter_value(value, path)
@@ -105,8 +106,9 @@ module Dry
       # Returns true if any filter matches the key or its full dotted path.
       def _filter?(key, path)
         # Checking the key catches anchored regexps such as `/\Apin\z/` on nested keys. Checking the
-        # path catches filters that span keys, such as `"user.token"`.
-        matcher.match?(key) || matcher.match?(path)
+        # path catches filters that span keys, such as `"user.token"`. At the top level the path is
+        # the key itself, so it is only checked once.
+        matcher.match?(key) || (!path.equal?(key) && matcher.match?(path))
       end
 
       # Filters every value inside a hash or array, keeping hash keys and array lengths so the

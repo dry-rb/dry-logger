@@ -281,6 +281,22 @@ RSpec.describe Dry::Logger::Filter do
       end
     end
 
+    context "with a key at the top level" do
+      subject(:filter) { described_class.new(%w[password]) }
+
+      it "matches the key once, since it is also its own path" do
+        matcher = filter.__send__(:matcher)
+        allow(matcher).to receive(:match?).and_call_original
+
+        filter.call(name: "Jane", user: {email: "jane@example.com"})
+
+        expect(matcher).to have_received(:match?).with("name").once
+        expect(matcher).to have_received(:match?).with("user").once
+        expect(matcher).to have_received(:match?).with("email").once
+        expect(matcher).to have_received(:match?).with("user.email").once
+      end
+    end
+
     context "with empty filters" do
       subject(:filter) { described_class.new([]) }
 
