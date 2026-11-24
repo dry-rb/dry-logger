@@ -61,6 +61,13 @@ RSpec.describe Dry::Logger::Dispatcher do
 
         expect { logger.public_send(level, message, **payload) }.to_not raise_error
       end
+
+      it "logs the payload keys but not their values" do
+        expect { logger.public_send(level, "Signing in", password: "secret", user_id: 1) }
+          .to output(
+            a_string_including("Signing in password, user_id\n").and(satisfy { |out| !out.include?("secret") })
+          ).to_stdout_from_any_process
+      end
     end
 
     describe "##{level} when dispatching crashes" do

@@ -46,6 +46,8 @@ module Dry
         logger.level = FATAL
       }.freeze
 
+      # Logs only the payload keys, since the payload has not been filtered yet.
+      #
       # @since 1.0.0
       # @api private
       ON_CRASH = -> (progname:, exception:, message:, payload:) {
@@ -53,7 +55,7 @@ module Dry
           severity: "FATAL",
           progname: progname,
           time: Time.now,
-          log_entry: [message, payload].map { |s|
+          log_entry: [message, payload.keys.join(", ")].map { |s|
             s.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
           }.reject(&:empty?).join(SEPARATOR),
           exception: exception.class,

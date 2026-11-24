@@ -19,6 +19,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
+- Log only the payload's keys when logging crashes. Previously the crash handler wrote the whole unfiltered payload to `$stdout`, including values matching the log filters. (@parndt in GHSA-w372-6w8v-8874)
+
 [Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.2.2...main
 
 ## [1.3.0] - 2026-11-18
