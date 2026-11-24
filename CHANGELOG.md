@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Break Versioning](https://www.taoensso.com/break-versioning).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Break Versioning](https://www.taoensso.com/break-versioning).
 
 ## [Unreleased]
 
@@ -19,9 +18,15 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
+[Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.3.1...main
+
+## [1.3.1] - 2026-11-24
+
+### Security
+
 - Log only the payload's keys when logging crashes. Previously the crash handler wrote the whole unfiltered payload to `$stdout`, including values matching the log filters. (@parndt in GHSA-w372-6w8v-8874)
 
-[Unreleased]: https://github.com/dry-rb/dry-logger/compare/v1.2.2...main
+[1.3.1]: https://github.com/dry-rb/dry-logger/compare/v1.3.0...v1.3.1
 
 ## [1.3.0] - 2026-11-18
 
